@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Skill Builder Extractor",
+  "version": "1.0.0",
+  "description": "Extrae lecciones de AWS Skill Builder a Markdown desde tu navegador.",
+  "minimum_chrome_version": "114",
+  "permissions": ["scripting", "webNavigation", "sidePanel", "activeTab", "tabs"],
+  "host_permissions": ["https://skillbuilder.aws/*", "https://*.skillbuilder.aws/*"],
+  "optional_host_permissions": ["https://*/*"],
+  "action": {
+    "default_title": "Skill Builder Extractor"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

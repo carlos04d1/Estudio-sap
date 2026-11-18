@@ -1,0 +1,259 @@
+{
+  "main": {
+    "id": "1ef89fe8281c1c22",
+    "type": "split",
+    "children": [
+      {
+        "id": "835f0f5614ebe471",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "58053d1258c70e38",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02 - Dominio 2 - Nuevas Soluciones/2.6 Determinar una estrategia de optimización de costos para cumplir las metas.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "2.6 Determinar una estrategia de optimización de costos para cumplir las metas"
+            }
+          },
+          {
+            "id": "6d78c87723607eef",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Skill Builder/Official Practice Question Set AWS Certified Solutions Architect - Professional SAP C02 Español LATAM)/Evaluacion 1 SB.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "Evaluacion 1 SB"
+            }
+          },
+          {
+            "id": "61a396232d53cc5b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "preguntas/preguntas-v1-manual.md",
+                "mode": "preview",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "preguntas-v1-manual"
+            }
+          }
+        ],
+        "currentTab": 2
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "8f3b92f00a5942b8",
+    "type": "split",
+    "children": [
+      {
+        "id": "3e05b6e8a1cb67a8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "97874bde51e1c82a",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "1197f0dfcd60bffb",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "f55e9aae26e11dea",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 470.29998779296875
+  },
+  "right": {
+    "id": "01fef2a66f6bd9de",
+    "type": "split",
+    "children": [
+      {
+        "id": "efecc994e6163807",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b9cb2e271a4305db",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "01 - Dominio 1 - Complejidad Organizacional/1.5 Determinar las estrategias de optimización de costos y visibilidad.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes"
+            }
+          },
+          {
+            "id": "435453f6d6bde0e6",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "01 - Dominio 1 - Complejidad Organizacional/1.5 Determinar las estrategias de optimización de costos y visibilidad.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes"
+            }
+          },
+          {
+            "id": "ba55a8592970d7e4",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "b5872f0052b16625",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "e8b6b02c5709f3c7",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "01 - Dominio 1 - Complejidad Organizacional/1.5 Determinar las estrategias de optimización de costos y visibilidad.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "61a396232d53cc5b",
+  "lastOpenFiles": [
+    "informacion base/Definicion servicios.md",
+    "Guia AWS.md",
+    "Skill Builder/COMPACT - Estado del estudio.md",
+    "Skill Builder/_Estandar de formato.md",
+    "Skill Builder/Official Practice Question Set AWS Certified Solutions Architect - Professional SAP C02 Español LATAM)/Notas - Evaluacion 1 SB.md",
+    "Skill Builder/Official Practice Question Set AWS Certified Solutions Architect - Professional SAP C02 Español LATAM)/Evaluacion 1 SB.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures/Amazon Route 53 Resolver.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Designing Advanced Network Architectures/AWS Transit Gateway Setup.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Designing Advanced Network Architectures/AWS Solutions Architect Advanced - Designing Advanced Network Architectures.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Designing Advanced Network Architectures/VPC Endpoints.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures/AWS Client VPN.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures/Gathering the Customer Requirements - Hybrid.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures/Course Overview - Optimizing Hybrid Architectures.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Optimizing Hybrid Architectures",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Activity - Architecture Challenge - Security.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/BuildingBlocks Videos - Security.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Finished Architecture - Security.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/AWS Secrets Manager.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/AWS CloudHSM.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Demo - AWS KMS.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/AWS KMS.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Cryptography.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Demo - AWS GuardDuty.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Amazon GuardDuty.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Tech Talk - AWS Security Hub.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data/Demo - AWS Security Hub.md",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Securing Networks and Data",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Designing Advanced Network Architectures",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Implementing Observability and Management Controls",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)/AWS Solutions Architect Advanced - Designing a Multi-Account Architecture",
+    "Skill Builder/AWS Solutions Architect Advanced Learning Plan (Includes Labs)",
+    "Skill Builder/opencode",
+    "Skill Builder/Official Practice Question Set AWS Certified Solutions Architect - Professional SAP C02 Español LATAM)",
+    "Skill Builder",
+    "preguntas"
+  ]
+}

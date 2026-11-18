@@ -1,0 +1,16 @@
+{
+  "name": "md2pdf",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "katex": "^0.16.47",
+    "mermaid": "^11.17.2"
+  }
+}

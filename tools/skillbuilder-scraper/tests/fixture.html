@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture - AWS Control Tower</title>
+<style>button{font:inherit}</style>
+</head>
+<body>
+<div id="ContentWrapper">
+<div id="ContentDiv">
+  <button id="prev_button" class="PrevLessonButton">Previous lesson</button>
+
+  <div class="Lesson">
+    <div><div id="messages" visible="false"></div></div>
+
+    <div class="LessonTitle"><h1 class="MaxWidth2">AWS Control Tower</h1></div>
+
+    <div class="MaxWidthVid">
+      <video controls><source src="x.mp4"><track kind="subtitles" src="x.vtt"></video>
+      <div class="MyGrid1Col">
+        <header><b>Transcript</b><button aria-label="close scrollable transcript">x</button></header>
+        <div class="SideTranscript flex-scrolly">
+          <button class="notselected">&lt;v -&gt;All right, now we'll look at AWS Control Tower,&lt;/v&gt;</button>
+          <button class="selected">a service that helps you set up and govern</button>
+          <button class="notselected">an AWS multi account environment with rules for security and compliance.</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="MaxWidth2"><span class="SafeHTMLSpan"><p>AWS Control Tower is a comprehensive solution for setting up and governing a secure, compliant, multi-account AWS environment.</p></span></div>
+
+    <hr class="breaky MaxWidth2">
+
+    <div>
+      <div class="Flex RowReverse MaxWidth2"><h2 id="s1">Controls</h2></div>
+      <div class="MaxWidth2"><span class="SafeHTMLSpan"><p>Controls are categorized according to their <b>behavior</b> and their <i>guidance</i>.</p></span></div>
+      <div class="MaxWidth2"><span class="SafeHTMLSpan"><ul>
+        <li><b>Preventive</b> &ndash; disallows actions that lead to policy violations.</li>
+        <li><b>Detective</b> &ndash; detects noncompliance of resources.</li>
+        <li><b>Proactive</b> &ndash; scans your resources before they are provisioned.</li>
+      </ul></span></div>
+      <div class="MaxWidth2"><div class="SafeHTML"><table>
+        <tbody>
+          <tr><th>Preventive</th><th>Detective</th><th>Proactive</th></tr>
+          <tr><td>Disallows actions. Sample: S3 public read</td><td>Detect noncompliance. Sample: CloudTrail + Config</td><td>Scans before provision. Sample: EBS encryption</td></tr>
+          <tr><td>enforced / not enabled</td><td>clear / in violation / not enabled</td><td>PASS / FAIL / SKIP</td></tr>
+        </tbody>
+      </table></div></div>
+    </div>
+
+    <hr class="breaky MaxWidth2">
+
+    <div>
+      <div class="Flex RowReverse MaxWidth2"><h2 id="s2">Landing zone</h2></div>
+      <div class="MaxWidth2"><span class="SafeHTMLSpan"><p>AWS Control Tower is a managed service.</p></span></div>
+      <div class="MaxWidth2"><div class="space"><div class="Carousel" role="region" aria-label="Carousel">
+        <div class="Flex">
+          <button aria-label="previous page">p</button>
+          <div class="CarouselContents" role="group" aria-roledescription="slide" aria-label="Slide 1 out of 3">
+            <h4>Building a Landing Zone</h4>
+            <div class="SafeHTML"><p>Building a landing zone involves you making technical and business decisions about account structure, networking, security, and access management.</p></div>
+          </div>
+          <button aria-label="next page">n</button>
+        </div>
+      </div></div></div>
+      <div class="MaxWidth2"><span class="SafeHTMLSpan"><p><b>Note: AWS Control Tower is a starting point for a landing zone.</b></p></span></div>
+    </div>
+
+    <hr class="breaky MaxWidth2">
+
+    <div>
+      <div class="Flex RowReverse MaxWidth2"><h2 id="s3">Components</h2></div>
+      <div class="MaxWidth2"><span class="SafeHTMLSpan"><p>To learn more about AWS Control Tower components, choose each numbered marker.</p></span></div>
+      <div class="MaxWidth2"><div class="space" role="region" aria-label="Interactive image">
+        <div class="HotSpotInfoSection" role="group" aria-label="marker content">
+          <div><h4>1: Management Account</h4><div class="SafeHTML"><p>The management account is the account you created specifically for your landing zone.</p></div></div>
+        </div>
+        <div role="group" aria-label="image markers">
+          <button aria-label="marker 1 of 3. selected. Marker for Management Account" class="CurrentHotSpotButton">1</button>
+          <button aria-label="marker 2 of 3.. Marker for Landing Zone" class="HotSpotButton">2</button>
+          <button aria-label="marker 3 of 3.. Marker for Controls" class="HotSpotButton">3</button>
+        </div>
+      </div></div>
+    </div>
+
+    <hr class="breaky MaxWidth2">
+
+    <div class="MaxWidth2" id="tabsHost">
+      <ul role="tablist">
+        <li role="presentation"><button role="tab" aria-selected="false" aria-controls="tabs-0-panel" id="tabs-0" type="button"><span>Blue/Green</span></button></li>
+        <li role="presentation"><button role="tab" aria-selected="true" aria-controls="tabs-1-panel" id="tabs-1" type="button"><span>Canary</span></button></li>
+        <li role="presentation"><button role="tab" aria-selected="false" aria-controls="tabs-2-panel" id="tabs-2" type="button"><span>Rolling</span></button></li>
+      </ul>
+      <div role="tabpanel" id="tabs-0-panel" aria-labelledby="tabs-0"></div>
+      <div role="tabpanel" id="tabs-1-panel" aria-labelledby="tabs-1"><div class="MaxWidth2"><span class="SafeHTMLSpan"><p>Routes a small percentage of traffic to the new version first.</p></span></div></div>
+      <div role="tabpanel" id="tabs-2-panel" aria-labelledby="tabs-2"></div>
+    </div>
+
+    <hr class="breaky MaxWidth2">
+
+    <div class="MaxWidth2"><span class="SafeHTMLSpan"><p>The video duration is 6 minutes, 19 seconds.</p></span></div>
+  </div>
+
+  <button class="NextLessonButton">Next lesson</button>
+</div>
+</div>
+
+<script>
+// Carousel: 3 slides, loops back to slide 1
+const slides = [
+  ["Building a Landing Zone", "Building a landing zone involves you making technical and business decisions about account structure, networking, security, and access management."],
+  ["Account structure", "Decide how many accounts you need and how they group into OUs."],
+  ["Networking", "Define VPCs, CIDRs and connectivity between accounts."]
+];
+let idx = 0;
+const contents = document.querySelector(".CarouselContents");
+document.querySelector('.Carousel button[aria-label="next page"]').addEventListener("click", () => {
+  idx = (idx + 1) % slides.length;
+  contents.setAttribute("aria-label", `Slide ${idx + 1} out of ${slides.length}`);
+  contents.innerHTML = `<h4>${slides[idx][0]}</h4><div class="SafeHTML"><p>${slides[idx][1]}</p></div>`;
+});
+
+// Hotspots: clicking a marker swaps the info panel
+const markers = [
+  "1: Management Account|The management account is the account you created specifically for your landing zone. Do not run production workloads here.",
+  "2: Landing Zone|A well-architected multi-account environment based on security and compliance best practices.",
+  "3: Controls|High-level rules that provide ongoing governance: preventive, detective or proactive."
+];
+const info = document.querySelector(".HotSpotInfoSection");
+document.querySelectorAll('button[aria-label*="marker"]').forEach((btn, i) => {
+  btn.addEventListener("click", () => {
+    const [t, body] = markers[i].split("|");
+    info.innerHTML = `<div><h4>${t}</h4><div class="SafeHTML"><p>${body}</p></div></div>`;
+  });
+});
+
+// Tabs: only the active panel has content
+const tabBodies = [
+  "Switches all traffic to a parallel environment at once.",
+  "Routes a small percentage of traffic to the new version first.",
+  "Replaces instances in batches."
+];
+const tabBtns = document.querySelectorAll('#tabsHost [role="tab"]');
+tabBtns.forEach((btn, i) => {
+  btn.addEventListener("click", () => {
+    tabBtns.forEach((b, j) => {
+      b.setAttribute("aria-selected", String(i === j));
+      document.getElementById(`tabs-${j}-panel`).innerHTML = i === j
+        ? `<div class="MaxWidth2"><span class="SafeHTMLSpan"><p>${tabBodies[j]}</p></span></div>` : "";
+    });
+  });
+});
+</script>
+</body>
+</html>

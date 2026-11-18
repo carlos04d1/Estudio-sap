@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Skill Builder Extractor</title>
+<link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+<h1>Skill Builder Extractor</h1>
+
+<fieldset>
+  <legend>Alcance</legend>
+  <label><input type="radio" name="mode" value="one" checked> Esta lección</label>
+  <label><input type="radio" name="mode" value="n"> Próximas <input type="number" id="count" min="1" value="5"> lecciones</label>
+  <label><input type="radio" name="mode" value="all"> Curso completo</label>
+  <label class="row">Pausa entre lecciones (s) <input type="number" id="delay" min="0" step="0.5" value="3"></label>
+</fieldset>
+
+<div class="buttons">
+  <button id="btnExtract" class="primary">Extraer</button>
+  <button id="btnStop" disabled>Detener</button>
+  <button id="btnCopy">Copiar todo</button>
+  <button id="btnSave">Guardar .md</button>
+  <button id="btnDiag">Diagnóstico</button>
+  <button id="btnClear">Limpiar</button>
+</div>
+
+<div id="stats">0 lecciones · 0 caracteres</div>
+<textarea id="output" spellcheck="false" placeholder="El Markdown extraído aparece acá."></textarea>
+
+<div class="label">Log</div>
+<pre id="log"></pre>
+
+<details>
+  <summary>Selectores (avanzado)</summary>
+  <textarea id="selectors" spellcheck="false"></textarea>
+  <div class="buttons">
+    <button id="btnSelSave">Guardar selectores</button>
+    <button id="btnSelReset">Restaurar por defecto</button>
+  </div>
+</details>
+
+<script src="selectors.js"></script>
+<script src="extract.js"></script>
+<script src="sidepanel.js"></script>
+</body>
+</html>

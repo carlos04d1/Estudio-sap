@@ -1,0 +1,46 @@
+﻿== AWS Solutions Architect Advanced - Optimizing Hybrid Architectures
+  AWS Client VPN.md                                       mermaid: 1  math: 0
+  AWS Direct Connect - Connection Options.md              mermaid: 1  math: 0
+  AWS Direct Connect - Redundancy and Resilience.md       mermaid: 1  math: 0
+  AWS Local Zones.md                                      mermaid: 1  math: 0
+  AWS Outposts.md                                         mermaid: 1  math: 0
+  AWS Site-to-Site VPN.md                                 mermaid: 2  math: 0
+  AWS Solutions Architect Advanced - Optimizing Hybrid Ar mermaid: 0  math: 0
+  AWS Wavelength.md                                       mermaid: 1  math: 0
+  Activity - Architecture Challenge.md                    mermaid: 0  math: 0
+  Amazon Route 53 Resolver.md                             mermaid: 1  math: 0
+  BuildingBlocks Videos - Hybrid.md                       mermaid: 1  math: 0
+  Course Overview - Optimizing Hybrid Architectures.md    mermaid: 0  math: 0
+  Finished Architecture.md                                mermaid: 1  math: 0
+  Gathering the Customer Requirements - Hybrid.md         mermaid: 1  math: 0
+== AWS Solutions Architect Advanced - Migration and Modernization
+  AWS Application Migration Service.md                    mermaid: 2  math: 0
+  AWS DataSync.md                                         mermaid: 2  math: 0
+  AWS Solutions Architect Advanced - Migration and Modern mermaid: 0  math: 0
+  AWS Transform Overview.md                               mermaid: 1  math: 0
+  AWS Transform for VMware.md                             mermaid: 4  math: 0
+  Activity - Architecture Challenge - Migration.md        mermaid: 2  math: 0
+  Before and After Modernization.md                       mermaid: 4  math: 0
+  BuildingBlocks Videos - Migration.md                    mermaid: 3  math: 1
+  Course Overview - Migration and Modernization.md        mermaid: 2  math: 0
+  Finished Architecture - Migration.md                    mermaid: 3  math: 0
+  Gathering the Customer Requirements - Migration.md      mermaid: 3  math: 0
+  Migrating Databases.md                                  mermaid: 4  math: 0
+  Migration Tools.md                                      mermaid: 2  math: 0
+  Modernize the Enterprise.md                             mermaid: 3  math: 0
+  Preparing for Migration.md                              mermaid: 4  math: 0
+  The Migration Process.md                                mermaid: 4  math: 0
+  Use Serverless Architectures.md                         mermaid: 4  math: 0
+  Using Containers to Modernize.md                        mermaid: 3  math: 0
+== AWS Solutions Architect Advanced - Operational Resilience
+  AWS Service Level Agreements.md                         mermaid: 3  math: 6
+  AWS Solutions Architect Advanced - Operational Resilien mermaid: 0  math: 0
+  AWS Systems Manager.md                                  mermaid: 2  math: 0
+  Building a Data Protection Strategy.md                  mermaid: 3  math: 0
+  BuildingBlocks Videos - Resilience.md                   mermaid: 2  math: 2
+  Course Overview - Operational Resilience.md             mermaid: 0  math: 0
+  Disaster Recovery Strategies.md                         mermaid: 2  math: 0
+  Disaster Recovery.md                                    mermaid: 1  math: 2
+  Finished Architecture - Resilience.md                   mermaid: 2  math: 0
+  Gathering the Customer Requirements - Resilience.md     mermaid: 1  math: 0
+  Key Performance Indicators.md                           mermaid: 3  math: 0
