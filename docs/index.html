@@ -520,14 +520,107 @@
       font-family: monospace;
     }
 
+    /* TARJETAS DE EXPLICACIÓN ESTRUCTURADAS */
+    .expl-card {
+      background-color: var(--surface-card);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+      margin-top: 0.85rem;
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .expl-card-best {
+      border-left: 5px solid var(--correct-color);
+      background-color: var(--correct-bg);
+    }
+
+    .expl-card-wrong {
+      border-left: 5px solid var(--wrong-color);
+      background-color: var(--wrong-bg);
+    }
+
+    .expl-card-title {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .expl-card-best .expl-card-title {
+      color: var(--correct-color);
+    }
+
+    .expl-card-wrong .expl-card-title {
+      color: var(--wrong-color);
+    }
+
+    .expl-card-content p {
+      margin-bottom: 0.5rem;
+    }
+
+    .expl-card-content p:last-child {
+      margin-bottom: 0;
+    }
+
+    .distractor-list {
+      list-style: none !important;
+      margin: 0.4rem 0 !important;
+      padding: 0 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .distractor-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      line-height: 1.5;
+    }
+
+    .distractor-badge {
+      flex-shrink: 0;
+      background-color: var(--wrong-color);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+      margin-top: 0.15rem;
+    }
+
+    .distractor-desc {
+      flex: 1;
+      color: var(--text-main);
+    }
+
     .concept-key-box {
       margin-top: 0.85rem;
-      padding: 0.75rem 1rem;
-      background-color: var(--surface-card);
-      border-left: 4px solid var(--brand-primary);
-      border-radius: 8px;
-      font-size: 0.9rem;
-      font-weight: 600;
+      padding: 0.85rem 1rem;
+      background-color: var(--brand-bg);
+      border-left: 5px solid var(--brand-primary);
+      border-radius: 10px;
+      font-size: 0.92rem;
+      color: var(--text-main);
+    }
+
+    .concept-key-title {
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: var(--brand-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     /* HOME / START SCREEN */
@@ -1081,12 +1174,23 @@
 
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i].trim();
+          
+          // Distractor con letra: - **A ✗** o - **A**
+          const distractorMatch = line.match(/^-\s+<strong>([A-F])\s*(?:✗|&#10007;|x|X)?<\/strong>:?\s*(.*)/);
           const bulletMatch = line.match(/^-\s+(.*)/);
           const numMatch = line.match(/^(\d+)\.\s+(.*)/);
 
-          if (bulletMatch) {
+          if (distractorMatch) {
+            if (!inList || listType !== 'distractor') {
+              if (inList) out.push(listType === 'ul' ? '</ul>' : (listType === 'ol' ? '</ol>' : '</ul>'));
+              out.push('<ul class="distractor-list">');
+              inList = true;
+              listType = 'distractor';
+            }
+            out.push('<li class="distractor-item"><span class="distractor-badge">' + distractorMatch[1] + ' ✗</span><span class="distractor-desc">' + distractorMatch[2] + '</span></li>');
+          } else if (bulletMatch) {
             if (!inList || listType !== 'ul') {
-              if (inList) out.push(listType === 'ul' ? '</ul>' : '</ol>');
+              if (inList) out.push(listType === 'ul' ? '</ul>' : (listType === 'ol' ? '</ol>' : '</ul>'));
               out.push('<ul>');
               inList = true;
               listType = 'ul';
@@ -1094,7 +1198,7 @@
             out.push('<li>' + bulletMatch[1] + '</li>');
           } else if (numMatch) {
             if (!inList || listType !== 'ol') {
-              if (inList) out.push(listType === 'ul' ? '</ul>' : '</ol>');
+              if (inList) out.push(listType === 'ul' ? '</ul>' : (listType === 'ol' ? '</ol>' : '</ul>'));
               out.push('<ol>');
               inList = true;
               listType = 'ol';
@@ -1102,14 +1206,13 @@
             out.push('<li>' + numMatch[2] + '</li>');
           } else {
             if (inList) {
-              out.push(listType === 'ul' ? '</ul>' : '</ol>');
+              out.push(listType === 'ul' ? '</ul>' : (listType === 'ol' ? '</ol>' : '</ul>'));
               inList = false;
               listType = null;
             }
             if (line.length > 0) {
-              // Si contiene icono de llave de concepto clave, darle caja destacada
               if (line.includes('🔑') || line.includes('Concepto clave:')) {
-                out.push('<div class="concept-key-box">' + line + '</div>');
+                out.push('<div class="concept-key-box"><div class="concept-key-title">🔑 Concepto clave:</div>' + line + '</div>');
               } else {
                 out.push('<p>' + line + '</p>');
               }
@@ -1117,9 +1220,83 @@
           }
         }
         if (inList) {
-          out.push(listType === 'ul' ? '</ul>' : '</ol>');
+          out.push(listType === 'ul' ? '</ul>' : (listType === 'ol' ? '</ol>' : '</ul>'));
         }
         return out.join('');
+      }
+
+      // --- 4.1 RENDERIZADOR DE EXPLICACIÓN ESTRUCTURADA ---
+      function renderExplanation(raw) {
+        if (!raw) return '';
+
+        let whyBestLines = [];
+        let whyOthersLines = [];
+        let keyConceptLines = [];
+        let currentSection = 'intro';
+
+        const lines = raw.split('\n');
+        for (let line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('**Respuesta correcta:') || trimmed.startsWith('**Respuestas correctas:')) {
+            // Se muestra en el banner superior
+            continue;
+          } else if (trimmed.toLowerCase().includes('por qué') && (trimmed.toLowerCase().includes('la mejor') || trimmed.toLowerCase().includes('las mejores') || trimmed.match(/por qué [a-f]/i))) {
+            currentSection = 'whyBest';
+            whyBestLines.push(trimmed);
+          } else if (trimmed.toLowerCase().includes('por qué las otras') || trimmed.toLowerCase().includes('por qué los otros') || trimmed.toLowerCase().includes('por qué la a no') || trimmed.toLowerCase().includes('por qué los demás')) {
+            currentSection = 'whyOthers';
+            whyOthersLines.push(trimmed);
+          } else if (trimmed.includes('🔑') || trimmed.toLowerCase().includes('concepto clave:')) {
+            currentSection = 'keyConcept';
+            keyConceptLines.push(trimmed);
+          } else {
+            if (currentSection === 'whyBest') whyBestLines.push(line);
+            else if (currentSection === 'whyOthers') whyOthersLines.push(line);
+            else if (currentSection === 'keyConcept') keyConceptLines.push(line);
+          }
+        }
+
+        let html = '';
+
+        // Sección: Por qué es la mejor opción
+        if (whyBestLines.length > 0) {
+          let text = whyBestLines.join('\n').replace(/^\*\*Por qué[^\n]*?\*\*:?\s*/i, '');
+          html += `
+            <div class="expl-card expl-card-best">
+              <div class="expl-card-title">
+                <span>✅ Por qué es la opción correcta</span>
+              </div>
+              <div class="expl-card-content">
+                ${renderMarkdown(text)}
+              </div>
+            </div>`;
+        }
+
+        // Sección: Por qué las otras opciones fallan (Distractores)
+        if (whyOthersLines.length > 0) {
+          let text = whyOthersLines.join('\n').replace(/^\*\*Por qué[^\n]*?\*\*:?\s*/i, '');
+          html += `
+            <div class="expl-card expl-card-wrong">
+              <div class="expl-card-title">
+                <span>❌ Por qué las otras opciones son incorrectas</span>
+              </div>
+              <div class="expl-card-content expl-distractors-list">
+                ${renderMarkdown(text)}
+              </div>
+            </div>`;
+        }
+
+        // Sección: Concepto clave para el examen
+        if (keyConceptLines.length > 0) {
+          let text = keyConceptLines.join('\n').replace(/^[🔑\s]*\*\*Concepto clave:\*\*\s*/i, '');
+          html += `
+            <div class="concept-key-box">
+              <div class="concept-key-title">🔑 Concepto clave para el examen</div>
+              <div>${renderMarkdown(text)}</div>
+            </div>`;
+        }
+
+        return html || renderMarkdown(raw);
       }
 
 
@@ -1419,8 +1596,8 @@
           feedbackTitle.textContent = `Incorrecto. Respuesta(s) correcta(s): ${correctKeys.join(', ')}`;
         }
 
-        // Cuerpo de la explicación
-        feedbackBody.innerHTML = renderMarkdown(q.explanation);
+        // Cuerpo de la explicación estructurada
+        feedbackBody.innerHTML = renderExplanation(q.explanation);
 
         // Desplazamiento suave para ver la retroalimentación
         setTimeout(() => {
@@ -1518,9 +1695,8 @@
             ${renderMarkdown(item.question.stem)}
             <p style="margin: 0.5rem 0 0.25rem;"><strong>Tu respuesta:</strong> ${item.selectedKeys.join(', ')}</p>
             <p style="margin-bottom: 0.75rem;"><strong>Respuesta correcta:</strong> ${item.question.correct.join(', ')}</p>
-            <div class="concept-key-box">
-              <strong>Explicación:</strong>
-              ${renderMarkdown(item.question.explanation)}
+            <div style="margin-top: 0.75rem;">
+              ${renderExplanation(item.question.explanation)}
             </div>
           `;
 

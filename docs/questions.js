@@ -60,7 +60,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** El **inbound endpoint** crea ENI en la VPC a las que el DNS local reenvía las consultas de `app.internal.example.com`. El **outbound endpoint** con una **regla de reenvío** envía las consultas de `corp.example.local` desde la VPC a los DNS locales. Ambos son administrados por AWS (cero servidores).\n\n**Por qué las otras no:**\n- **A ✗** Funciona, pero obliga a parchear, escalar y dar alta disponibilidad a servidores DNS propios: exactamente lo que se quiere evitar.\n- **B ✗** Una"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** El **inbound endpoint** crea ENI en la VPC a las que el DNS local reenvía las consultas de `app.internal.example.com`. El **outbound endpoint** con una **regla de reenvío** envía las consultas de `corp.example.local` desde la VPC a los DNS locales. Ambos son administrados por AWS (cero servidores).\n\n**Por qué las otras no:**\n- **A ✗** Funciona, pero obliga a parchear, escalar y dar alta disponibilidad a servidores DNS propios: exactamente lo que se quiere evitar.\n- **B ✗** Una zona hospedada privada se asocia a **VPC**, no a servidores locales. Una zona pública para un nombre interno expone información y no reenvía nada a los DNS locales.\n- **D ✗** Un outbound endpoint solo permite que la VPC **salga** a resolver nombres externos; no recibe consultas del centro de datos.\n\n🔑 **Concepto clave:** *Inbound* = on-prem → AWS. *Outbound* = AWS → on-prem. Las reglas de reenvío se pueden compartir entre cuentas con RAM."
   },
   {
     "id": 3,
@@ -91,7 +91,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** El *interface endpoint* de S3 es una ENI con **IP privada** dentro de la VPC y **sí es accesible desde on-premises** por Direct Connect o VPN. Es totalmente administrado.\n\n**Por qué las otras no:**\n- **B ✗** Los *gateway endpoints* operan solo mediante **tablas de rutas de la VPC**: no son alcan"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** El *interface endpoint* de S3 es una ENI con **IP privada** dentro de la VPC y **sí es accesible desde on-premises** por Direct Connect o VPN. Es totalmente administrado.\n\n**Por qué las otras no:**\n- **B ✗** Los *gateway endpoints* operan solo mediante **tablas de rutas de la VPC**: no son alcanzables desde redes locales.\n- **C ✗** Un NAT gateway da salida a Internet desde subredes privadas; no sirve de destino para tráfico entrante desde on-premises y usaría IP públicas de S3.\n- **D ✗** Cumple técnicamente, pero agrega una flota de proxies que hay que operar y parchear. El interface endpoint elimina esa sobrecarga.\n\n🔑 **Concepto clave:** Gateway endpoint (S3/DynamoDB, gratis, solo desde la VPC) vs. Interface endpoint (PrivateLink, con costo, accesible desde on-premises)."
   },
   {
     "id": 4,
@@ -153,7 +153,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **Security Hub** agrega halla"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **Security Hub** agrega hallazgos de GuardDuty, Inspector, Macie y estándares (CIS, FSBP). Con **administrador delegado** y **auto-enable** a nivel de organización, las cuentas nuevas se suman solas; la **agregación entre Regiones** da una vista única y **EventBridge → SNS** cubre las notificaciones. Se usa una cuenta de seguridad distinta de la de administración de la organización.\n\n**Por qué las otras no:**\n- **A ✗** Invitaciones manuales por cuenta y Región: alta sobrecarga y propenso a errores.\n- **C ✗** AWS Config evalúa el **cumplimiento de configuración** de recursos; no consolida hallazgos de amenazas de GuardDuty, Inspector o Macie.\n- **D ✗** CloudTrail son registros, no hallazgos: habría que construir la detección y la consolidación.\n\n🔑 **Concepto clave:** Security Hub + admin delegado + auto-enable + agregación entre Regiones."
   },
   {
     "id": 6,
@@ -220,7 +220,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Aurora Global Database replica con retraso típico **< 1 segundo** (RPO de segundos) y permite promover el secundario en **menos de un minuto**. Una flota reducida ya en ejecución escala en minutos (RTO ≈ minutos) con un costo mucho menor que el activo-activo.\n\n**Por qué las otras no:**\n- **A ✗** RPO de ~1 hora y RTO de horas: incumple ambos.\n- **B ✗** Los snapshots cada 15 minutos dan RPO de 15 min (> pocos segundos) y lan"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Aurora Global Database replica con retraso típico **< 1 segundo** (RPO de segundos) y permite promover el secundario en **menos de un minuto**. Una flota reducida ya en ejecución escala en minutos (RTO ≈ minutos) con un costo mucho menor que el activo-activo.\n\n**Por qué las otras no:**\n- **A ✗** RPO de ~1 hora y RTO de horas: incumple ambos.\n- **B ✗** Los snapshots cada 15 minutos dan RPO de 15 min (> pocos segundos) y lanzar toda la pila supera el RTO.\n- **D ✗** Cumple los tiempos pero cuesta el doble y exige escrituras multi-Región (Aurora Global Database tiene **una sola Región de escritura**), complejidad innecesaria cuando no se exige activo-activo.\n\n🔑 **Concepto clave:** Backup/restore (horas) → Luz piloto (decenas de min) → Espera activa (minutos) → Multi-sitio (≈ 0). Elige el **más barato que cumpla** RTO/RPO."
   },
   {
     "id": 8,
@@ -251,7 +251,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** **Elastic Disaster Recovery** replica de forma continua a **nivel de bloque** hacia un área de preparación (*staging*) con instancias pequeñas y volúmenes EBS económicos. Solo se lan"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** **Elastic Disaster Recovery** replica de forma continua a **nivel de bloque** hacia un área de preparación (*staging*) con instancias pequeñas y volúmenes EBS económicos. Solo se lanzan las instancias de recuperación completas durante un simulacro o un desastre → RPO de segundos, RTO de minutos y bajo costo.\n\n**Por qué las otras no:**\n- **B ✗** Backups diarios: RPO de horas.\n- **C ✗** Proceso manual y puntual: RPO de ~24 h y RTO alto.\n- **D ✗** DMS replica **bases de datos**, no servidores completos.\n\n🔑 **Concepto clave:** Servidores on-prem/otra nube → AWS con RPO de segundos = AWS Elastic Disaster Recovery."
   },
   {
     "id": 9,
@@ -282,7 +282,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "D"
     ],
-    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** Por defecto, Auto Scaling solo usa las comprobaciones de **EC2** (hardware/hipervisor). Con el tipo **ELB**, también reempla"
+    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** Por defecto, Auto Scaling solo usa las comprobaciones de **EC2** (hardware/hipervisor). Con el tipo **ELB**, también reemplaza instancias que el balanceador considera *unhealthy*, es decir, fallos de aplicación. El período de gracia evita reemplazos prematuros durante el arranque.\n\n**Por qué las otras no:**\n- **A ✗** `StatusCheckFailed_System` detecta problemas del **host subyacente**, no de la aplicación.\n- **B ✗** Oculta el problema pagando por instancias zombis; no recupera nada.\n- **C ✗** Operación manual por instancia y no reemplaza instancias dañadas.\n\n🔑 **Concepto clave:** ASG + ELB health checks = recuperación automática ante fallos a nivel de aplicación."
   },
   {
     "id": 10,
@@ -313,7 +313,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Las **SCP** son guardarraíles **preventivos** que limitan el máximo de permisos de las cuentas miembro, incluso para sus administradores. `aws:RequestedRegion` con excepciones para servicios globales (IAM, Organi"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Las **SCP** son guardarraíles **preventivos** que limitan el máximo de permisos de las cuentas miembro, incluso para sus administradores. `aws:RequestedRegion` con excepciones para servicios globales (IAM, Organizations, Route 53, CloudFront…) implementa la residencia de datos; denegar `cloudtrail:StopLogging`, `config:StopConfigurationRecorder`, etc. protege la auditoría. AWS Control Tower ofrece controles equivalentes.\n\n**Por qué las otras no:**\n- **A ✗** Un administrador de la cuenta puede **editar o eliminar** esas políticas IAM.\n- **C ✗** Es **detectivo/reactivo**: el recurso existe (y los datos salen) antes de eliminarse; además los admins podrían desactivar Config.\n- **D ✗** Las SCP **no afectan a la cuenta de administración** y adjuntarlas solo allí no restringe a las cuentas miembro.\n\n🔑 **Concepto clave:** Preventivo = SCP. Detectivo = AWS Config. Las SCP no se aplican a la cuenta de administración."
   },
   {
     "id": 11,
@@ -344,7 +344,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** Un **trail de la organi"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** Un **trail de la organización** se aplica automáticamente a todas las cuentas, **incluidas las futuras**, y los miembros no pueden modificarlo ni eliminarlo. Entregar a un bucket en una **cuenta de Log Archive** separa funciones; la **validación de integridad** (digests firmados) demuestra que los registros no fueron alterados.\n\n**Por qué las otras no:**\n- **B ✗** Las cuentas nuevas requieren ejecutar el script y los administradores locales pueden borrar su trail o su bucket.\n- **C ✗** El historial de eventos solo conserva 90 días y la exportación manual no es auditable ni centralizada.\n- **D ✗** Siguen siendo registros locales, modificables por los administradores de cada cuenta y sin centralización.\n\n🔑 **Concepto clave:** Trail de organización + cuenta de Log Archive + validación de integridad."
   },
   {
     "id": 12,
@@ -375,7 +375,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Hacen falta **dos pie"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Hacen falta **dos piezas**: (1) **estandarizar** (tag policy: clave y valores permitidos) y (2) **activar** la etiqueta como *cost allocation tag* en Billing desde la cuenta de administración. Solo entonces los costos se pueden desglosar por la etiqueta.\n\n**Por qué las otras no:**\n- **A ✗** Una política de etiquetas **no activa** la etiqueta para costos; sin activación no aparece en Cost Explorer.\n- **B ✗** Activa la etiqueta pero los valores inconsistentes fragmentan el reporte (`finance` ≠ `Finance`).\n- **D ✗** Quién creó el recurso no equivale a qué unidad de negocio es dueña del costo.\n\n🔑 **Concepto clave:** Tag policy (consistencia) + activación de *cost allocation tags* (visibilidad). La activación **no es retroactiva** y puede tardar hasta 24 h."
   },
   {
     "id": 13,
@@ -437,7 +437,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Con permisos **administrados por el servicio**, StackSets crea los roles necesarios automáticamente mediante Organi"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Con permisos **administrados por el servicio**, StackSets crea los roles necesarios automáticamente mediante Organizations y, con la **implementación automática**, aplica la pila a las cuentas nuevas que se unan a la OU.\n\n**Por qué las otras no:**\n- **A ✗** Código a mantener (manejo de errores, reintentos, Regiones, cuentas nuevas): reinventa StackSets.\n- **C ✗** Funciona, pero cada cuenta nueva exige crear manualmente los roles: más trabajo y riesgo.\n- **D ✗** Una pila (aunque sea anidada) vive en **una cuenta y una Región**; no se despliega en varias cuentas.\n\n🔑 **Concepto clave:** StackSets service-managed + auto-deployment = línea base multi-cuenta/multi-Región."
   },
   {
     "id": 15,
@@ -468,7 +468,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** En a"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** En azul/verde, el entorno nuevo (*green*) se levanta junto al actual; el **listener de prueba** permite validarlo antes del cambio de tráfico y la reversión es **redirigir el tráfico de vuelta** al entorno *blue*, que sigue intacto (segundos), disparada por alarmas de CloudWatch.\n\n**Por qué las otras no:**\n- **B ✗** No hay validación previa con tráfico de prueba y revertir implica **reemplazar tareas** de nuevo (lento).\n- **C ✗** Provoca interrupción (0 % saludable) y no tiene reversión rápida.\n- **D ✗** El caché DNS y los TTL hacen el cambio y la reversión lentos y manuales.\n\n🔑 **Concepto clave:** Reversión instantánea = azul/verde. Menor riesgo gradual = canary/lineal."
   },
   {
     "id": 16,
@@ -499,7 +499,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** La política *failover* envía el tráfico al **primario** mientras esté saludable y pasa **automáticamente** al **secundario** si la comprobación de estado falla: es el patrón activo-pasivo.\n\n**Por qué las otras no:**\n- **A ✗** La latencia reparte el tráfico a ambas Regiones (activo-activo), no solo en fallo.\n- **B ✗** Requiere intervención manual: incumple el requisito de automati"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** La política *failover* envía el tráfico al **primario** mientras esté saludable y pasa **automáticamente** al **secundario** si la comprobación de estado falla: es el patrón activo-pasivo.\n\n**Por qué las otras no:**\n- **A ✗** La latencia reparte el tráfico a ambas Regiones (activo-activo), no solo en fallo.\n- **B ✗** Requiere intervención manual: incumple el requisito de automatización.\n- **D ✗** El enrutamiento simple devuelve todos los valores (no hay comprobación de estado ni prioridad).\n\n🔑 **Concepto clave:** Activo-pasivo = failover. Activo-activo = latencia, geolocalización o ponderada con health checks."
   },
   {
     "id": 17,
@@ -561,7 +561,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** AWS Backup soporta EBS, RDS y EFS, se gobierna centralmente con **backup policies de Organi"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** AWS Backup soporta EBS, RDS y EFS, se gobierna centralmente con **backup policies de Organizations** y permite **copias entre cuentas y Regiones**. **Vault Lock en modo cumplimiento** hace los respaldos **inmutables**: tras el período de gracia, ni el usuario raíz ni AWS pueden alterar la retención.\n\n**Por qué las otras no:**\n- **A ✗** Es un desarrollo propio, no centralizado ni inmutable.\n- **C ✗** MFA Delete protege objetos en S3 pero no cubre los respaldos nativos de EBS/RDS/EFS ni es inmutabilidad real.\n- **D ✗** En modo **gobernanza**, usuarios con permisos especiales **pueden quitar o cambiar** el bloqueo: no cumple \"nadie puede eliminarlas\".\n\n🔑 **Concepto clave:** *Compliance mode* = inmutable. *Governance mode* = reversible por usuarios autorizados."
   },
   {
     "id": 19,
@@ -597,7 +597,7 @@ window.ALL_QUESTIONS = [
       "A",
       "D"
     ],
-    "explanation": "**Respuestas correctas: A y D**\n\n**Por qué A y D:**\n- **A:** CloudFront absorbe y distribuye el tráfico en el borde; **WAF** con reglas administradas bloquea SQLi y las **reglas basadas en tasa** limitan el *scraping* por IP, sin listas manuales.\n- **D:** **Shield Advanced** añade protección DDoS L3/L4/L7, acceso al **equipo de respuesta (SRT)** y **protección de costos** por picos asociados a un ataque.\n\n**Por qué las otras no:**\n- **B ✗** Las ACL de red tienen pocas reglas y no escalan a miles de IP cambiantes.\n- **C ✗** GuardDuty **detecta** amena"
+    "explanation": "**Respuestas correctas: A y D**\n\n**Por qué A y D:**\n- **A:** CloudFront absorbe y distribuye el tráfico en el borde; **WAF** con reglas administradas bloquea SQLi y las **reglas basadas en tasa** limitan el *scraping* por IP, sin listas manuales.\n- **D:** **Shield Advanced** añade protección DDoS L3/L4/L7, acceso al **equipo de respuesta (SRT)** y **protección de costos** por picos asociados a un ataque.\n\n**Por qué las otras no:**\n- **B ✗** Las ACL de red tienen pocas reglas y no escalan a miles de IP cambiantes.\n- **C ✗** GuardDuty **detecta** amenazas; no bloquea tráfico por sí mismo.\n- **E ✗** Un sitio público de comercio electrónico no puede limitarse a IP conocidas.\n\n🔑 **Concepto clave:** WAF = capa 7 (SQLi, rate limiting). Shield Advanced = DDoS + SRT + protección de costos."
   },
   {
     "id": 20,
@@ -659,7 +659,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "D"
     ],
-    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** Las **patch policies** con Quick Setup definen líneas base, programaciones y ámbito (OU/Regiones/etiquetas) para toda la organi"
+    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** Las **patch policies** con Quick Setup definen líneas base, programaciones y ámbito (OU/Regiones/etiquetas) para toda la organización y consolidan el **cumplimiento** de parches.\n\n**Por qué las otras no:**\n- **A ✗** Inspector **detecta vulnerabilidades**, no instala parches.\n- **B ✗** Hornear AMIs es válido para flotas inmutables, pero no resuelve el cumplimiento de las instancias existentes y exige reemplazo manual.\n- **C ✗** Manual, no escala y no genera reportes.\n\n🔑 **Concepto clave:** Patch Manager aplica parches; Inspector los descubre."
   },
   {
     "id": 22,
@@ -752,7 +752,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** La geolocali"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** La geolocalización enruta por **la ubicación del usuario** (país/continente) y **garantiza** que Europa vaya a eu-central-1. El registro predeterminado atiende a las ubicaciones sin coincidencia.\n\n**Por qué las otras no:**\n- **B ✗** La latencia enruta por la Región más rápida, que podría ser us-east-1 para algunos usuarios europeos.\n- **C ✗** La geoproximidad enruta por **distancia**, no garantiza que un usuario de la UE termine en la UE.\n- **D ✗** El reparto ponderado es aleatorio y no respeta residencia.\n\n🔑 **Concepto clave:** Requisito legal/residencia = geolocalización. Rendimiento = latencia."
   },
   {
     "id": 25,
@@ -876,7 +876,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Config **evalúa continuamente** la configuración, marca los recursos no conformes y su **remediación automática** invoca documentos de **Systems Manager Automation**. Todo queda registrado (historial de Config, ejecuciones de Automation). En paralelo conviene activar **S3 Block Public Access** a nivel de cuenta/organi"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Config **evalúa continuamente** la configuración, marca los recursos no conformes y su **remediación automática** invoca documentos de **Systems Manager Automation**. Todo queda registrado (historial de Config, ejecuciones de Automation). En paralelo conviene activar **S3 Block Public Access** a nivel de cuenta/organización como control **preventivo**.\n\n**Por qué las otras no:**\n- **A ✗** Manual y semanal: no cumple \"en minutos\" ni es automático.\n- **C ✗** Inspector escanea vulnerabilidades de cómputo/contenedores/Lambda; no corrige configuración de S3.\n- **D ✗** Mensual y manual.\n\n🔑 **Concepto clave:** Detección + corrección automática = AWS Config + SSM Automation. Prevención = Block Public Access / SCP."
   },
   {
     "id": 29,
@@ -907,7 +907,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "D"
     ],
-    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** SAM integra **CodeDeploy** con alias de Lambda: el tráfico se despla"
+    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** SAM integra **CodeDeploy** con alias de Lambda: el tráfico se desplaza de forma **canary** (10 % → 100 % tras 10 min) y las **alarmas** provocan una **reversión automática** al alias anterior. No requiere infraestructura adicional.\n\n**Por qué las otras no:**\n- **A ✗** Sin gradualidad ni reversión automática.\n- **B ✗** El caché DNS lo hace impreciso y el script es código a mantener.\n- **C ✗** Elastic Beanstalk no aplica a funciones Lambda.\n\n🔑 **Concepto clave:** Lambda + CodeDeploy = canary/lineal con alias ponderados y rollback por alarmas."
   },
   {
     "id": 30,
@@ -938,7 +938,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** La **observabilidad entre cuentas** (OAM) permite que una cuenta de monitoreo **consulte** métricas, registros y tra"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** La **observabilidad entre cuentas** (OAM) permite que una cuenta de monitoreo **consulte** métricas, registros y trazas de las cuentas de origen **sin copiarlos**, y puede incorporarlas por OU. Es nativa y se opera desde una sola consola.\n\n**Por qué las otras no:**\n- **B ✗** Es una canalización a construir, con datos duplicados y retrasos.\n- **C ✗** No hay vista única: hay 50 paneles distintos.\n- **D ✗** Análisis diferido, no un panel operativo en tiempo real.\n\n🔑 **Concepto clave:** CloudWatch cross-account observability = monitoreo centralizado sin copiar datos (por Región)."
   },
   {
     "id": 31,
@@ -974,7 +974,7 @@ window.ALL_QUESTIONS = [
       "A",
       "C"
     ],
-    "explanation": "**Respuestas correctas: A y C**\n\n**Por qué A y C:**\n- **A:** El anali"
+    "explanation": "**Respuestas correctas: A y C**\n\n**Por qué A y C:**\n- **A:** El analizador de **acceso no utilizado** señala roles, usuarios, claves y **permisos** no usados en un periodo definido.\n- **C:** La **generación de políticas** crea una política de mínimo privilegio a partir de la actividad real de CloudTrail.\n\n**Por qué las otras no:**\n- **B ✗** El informe de credenciales cubre **usuarios** (contraseñas, claves, MFA), no permisos de roles.\n- **D ✗** GuardDuty detecta **comportamiento anómalo/amenazas**, no permisos sobrantes.\n- **E ✗** La comprobación \"IAM Use\" solo verifica que exista al menos un usuario IAM; no analiza permisos.\n\n🔑 **Concepto clave:** Auditar mínimo privilegio = Access Analyzer (unused access + policy generation)."
   },
   {
     "id": 32,
@@ -1005,7 +1005,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** **Macie** usa ML y patrones para **clasificar datos sensibles** en S3, se administra de forma centrali"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** **Macie** usa ML y patrones para **clasificar datos sensibles** en S3, se administra de forma centralizada para toda la organización y emite hallazgos a EventBridge para notificaciones.\n\n**Por qué las otras no:**\n- **A ✗** GuardDuty S3 Protection detecta **accesos sospechosos**, no clasifica el contenido.\n- **B ✗** Inspector busca vulnerabilidades de software, no PII.\n- **D ✗** Cifrar no indica **qué datos** hay en el bucket.\n\n🔑 **Concepto clave:** PII en S3 = Macie."
   },
   {
     "id": 33,
@@ -1036,7 +1036,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Session Manager no necesita **ningún puerto de entrada**; la autenticación y autori"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Session Manager no necesita **ningún puerto de entrada**; la autenticación y autorización son por **IAM**, las sesiones se pueden **registrar** y, con los endpoints de VPC, funciona en subredes privadas sin Internet (requiere agente SSM y un perfil de instancia).\n\n**Por qué las otras no:**\n- **A ✗** Sigue habiendo puerto 22 abierto y no hay registro de sesión por defecto.\n- **C ✗** Mantiene las claves compartidas y SSH; añade una VPN que operar.\n- **D ✗** Rotar claves no elimina el puerto abierto ni da auditoría de sesión.\n\n🔑 **Concepto clave:** Acceso a instancias sin puertos ni claves = Session Manager."
   },
   {
     "id": 34,
@@ -1098,7 +1098,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** Una carga **fuertemente acoplada** necesita latencia mínima y ancho de banda máximo entre nodos: el grupo de **clúster** agrupa instancias físicamente cercanas en una AZ y **EFA** ofrece comunicación con *OS-bypass* para MPI.\n\n**Por qué las otras no:**\n- **B ✗** *Spread* separa instancias en hardware distinto (alta disponibilidad de pocas instancias críticas), lo contrario a lo que se necesita.\n- **C ✗** *Partition* aísla fallos entre grupos de instancias (Hadoop/Cassandra), no optimi"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** Una carga **fuertemente acoplada** necesita latencia mínima y ancho de banda máximo entre nodos: el grupo de **clúster** agrupa instancias físicamente cercanas en una AZ y **EFA** ofrece comunicación con *OS-bypass* para MPI.\n\n**Por qué las otras no:**\n- **B ✗** *Spread* separa instancias en hardware distinto (alta disponibilidad de pocas instancias críticas), lo contrario a lo que se necesita.\n- **C ✗** *Partition* aísla fallos entre grupos de instancias (Hadoop/Cassandra), no optimiza la latencia.\n- **D ✗** Más AZ aumenta la latencia entre nodos.\n\n🔑 **Concepto clave:** Cluster = rendimiento de red. Spread = aislamiento de pocas instancias. Partition = aislamiento por grupos grandes."
   },
   {
     "id": 36,
@@ -1129,7 +1129,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Service Quotas expone **métricas de uso** en CloudWatch para crear **alarmas proactivas** y permite **plantillas de solicitud** que se aplican automáticamente a las cuentas nuevas de la organi"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Service Quotas expone **métricas de uso** en CloudWatch para crear **alarmas proactivas** y permite **plantillas de solicitud** que se aplican automáticamente a las cuentas nuevas de la organización. Los aumentos se solicitan **antes** del evento.\n\n**Por qué las otras no:**\n- **A ✗** Las cuotas de vCPU son **por Región**, no por zona de disponibilidad.\n- **B ✗** Revisión manual y esporádica: no es proactiva ni automatizada.\n- **D ✗** Spot tiene sus propias cuotas y no elimina el riesgo.\n\n🔑 **Concepto clave:** Cuotas = por Región/cuenta; monitorear uso con alarmas y solicitar aumentos con anticipación."
   },
   {
     "id": 37,
@@ -1160,7 +1160,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **Compute Optimi"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **Compute Optimizer** analiza el uso histórico y recomienda tamaños/familias óptimos. Por defecto usa CPU, red y disco; para que la **memoria** cuente se necesita el **agente de CloudWatch**. Se puede activar a nivel de organización.\n\n**Por qué las otras no:**\n- **A ✗** La comprobación de baja utilización se basa en CPU y red, no en memoria.\n- **C ✗** Detener instancias por CPU puede interrumpir cargas intensivas en memoria; no es dimensionamiento.\n- **D ✗** Es ensayo y error con riesgo de impacto en producción.\n\n🔑 **Concepto clave:** Memoria en rightsizing = Compute Optimizer + CloudWatch agent."
   },
   {
     "id": 38,
@@ -1191,7 +1191,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "A"
     ],
-    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** **AWS Budgets** soporta alertas sobre costos **reales y pronosticados** y **acciones de presupuesto** que pueden aplicar una **política IAM o SCP** (o detener instancias EC2/RDS) automáticamente al superar un umbral.\n\n**Por qué las otras no:**\n- **B ✗** Solo notifica; no aplica restricciones ni usa pronóstico.\n- **C ✗** Manual y los Savings Plans no limitan gastos de *sandbox*.\n- **D ✗** Informativo y diferido: no actúa.\n\n🔑 **Concepto clave:** Control de gasto automati"
+    "explanation": "**Respuesta correcta: A**\n\n**Por qué A es la mejor:** **AWS Budgets** soporta alertas sobre costos **reales y pronosticados** y **acciones de presupuesto** que pueden aplicar una **política IAM o SCP** (o detener instancias EC2/RDS) automáticamente al superar un umbral.\n\n**Por qué las otras no:**\n- **B ✗** Solo notifica; no aplica restricciones ni usa pronóstico.\n- **C ✗** Manual y los Savings Plans no limitan gastos de *sandbox*.\n- **D ✗** Informativo y diferido: no actúa.\n\n🔑 **Concepto clave:** Control de gasto automatizado = Budgets + Budget Actions."
   },
   {
     "id": 39,
@@ -1222,7 +1222,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "D"
     ],
-    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** El **agente de Discovery** recopila configuración, rendimiento, **conexiones de red y procesos** de cada servidor; Migration Hub muestra las **dependencias** para agrupar aplicaciones y planificar oleadas.\n\n**Por qué las otras no:**\n- **A ✗** Manual, sin utili"
+    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** El **agente de Discovery** recopila configuración, rendimiento, **conexiones de red y procesos** de cada servidor; Migration Hub muestra las **dependencias** para agrupar aplicaciones y planificar oleadas.\n\n**Por qué las otras no:**\n- **A ✗** Manual, sin utilización real ni dependencias.\n- **B ✗** Compute Optimizer analiza recursos que **ya están en AWS**.\n- **C ✗** El recolector sin agente (VMware) obtiene configuración y rendimiento, pero **no datos de conexiones de red/procesos** necesarios para dependencias.\n\n🔑 **Concepto clave:** Dependencias entre servidores = *agent-based* Application Discovery Service + Migration Hub."
   },
   {
     "id": 40,
@@ -1253,7 +1253,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Los **Dedicated Hosts** exponen **sockets, núcleos y afinidad de host**, requisitos típicos de licencias BYOL. **License Manager** automati"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** Los **Dedicated Hosts** exponen **sockets, núcleos y afinidad de host**, requisitos típicos de licencias BYOL. **License Manager** automatiza la asignación de hosts, aplica límites y reporta el uso para el cumplimiento.\n\n**Por qué las otras no:**\n- **A ✗** Las *Dedicated Instances* aíslan el hardware pero **no dan visibilidad de sockets/núcleos ni afinidad** de host.\n- **B ✗** Spot en hardware compartido no sirve para licencias ligadas a hardware.\n- **D ✗** La licencia incluida contradice el objetivo de **reutilizar las licencias existentes**.\n\n🔑 **Concepto clave:** BYOL por socket/núcleo = Dedicated Hosts + License Manager."
   },
   {
     "id": 41,
@@ -1320,7 +1320,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **MGN** instala un agente que **replica continuamente** los discos hacia un área de preparación, permite **lan"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** **MGN** instala un agente que **replica continuamente** los discos hacia un área de preparación, permite **lanzar instancias de prueba** sin afectar el origen y realizar el **corte** en minutos, sin cambios de SO.\n\n**Por qué las otras no:**\n- **A ✗** Es un proceso puntual, con inactividad y sin replicación continua.\n- **C ✗** DataSync mueve archivos/objetos, no servidores completos.\n- **D ✗** Manual, no continuo y no aplica a servidores locales.\n\n🔑 **Concepto clave:** Rehost de servidores = AWS Application Migration Service."
   },
   {
     "id": 43,
@@ -1356,7 +1356,7 @@ window.ALL_QUESTIONS = [
       "C",
       "D"
     ],
-    "explanation": "**Respuestas correctas: C y D**\n\n**Por qué C y D:** A ~3 TB/día, 600 TB tardarían **~200 días**: la carga masiva debe ir en dispositivos **Snowball Edge**. Los cambios posteriores se sincroni"
+    "explanation": "**Respuestas correctas: C y D**\n\n**Por qué C y D:** A ~3 TB/día, 600 TB tardarían **~200 días**: la carga masiva debe ir en dispositivos **Snowball Edge**. Los cambios posteriores se sincronizan con **DataSync** sobre la red.\n\n**Por qué las otras no:**\n- **A ✗** ~200 días ≫ 6 semanas.\n- **B ✗** Aprovisionar Direct Connect puede tardar **semanas o meses**: no cabe en la ventana.\n- **E ✗** Snowmobile está pensado para **decenas de PB a EB**; sería exagerado para 600 TB.\n\n🔑 **Concepto clave:** Muchos TB + poco ancho de banda = Snow Family (bulk) + DataSync (delta). Cálculo rápido: 1 Gbps al 100 % ≈ 10 TB/día."
   },
   {
     "id": 44,
@@ -1418,7 +1418,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "B"
     ],
-    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Una arquitectura **sin estado** permite escalar hori"
+    "explanation": "**Respuesta correcta: B**\n\n**Por qué B es la mejor:** Una arquitectura **sin estado** permite escalar horizontalmente y sobrevivir a la pérdida de instancias. Las sesiones externas (ElastiCache o DynamoDB) son accesibles desde cualquier instancia.\n\n**Por qué las otras no:**\n- **A ✗** La afinidad mantiene al usuario en una instancia, pero si esa instancia se termina **la sesión se pierde** y el balanceo queda desigual.\n- **C ✗** EBS Multi-Attach es de una **sola AZ**, requiere un sistema de archivos con soporte de clúster y no es una solución de sesiones.\n- **D ✗** Mantiene el punto único de falla.\n\n🔑 **Concepto clave:** Escalar y recuperar = instancias sin estado + estado externo."
   },
   {
     "id": 46,
@@ -1480,7 +1480,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "D"
     ],
-    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** *Strangler fig* reempla"
+    "explanation": "**Respuesta correcta: D**\n\n**Por qué D es la mejor:** *Strangler fig* reemplaza el monolito **poco a poco**: cada ruta migrada se redirige al nuevo servicio y, si falla, se vuelve a apuntar al monolito. No hay ventana de interrupción ni riesgo de \"gran explosión\".\n\n**Por qué las otras no:**\n- **A ✗** Reescritura *big bang*: alto riesgo, sin valor hasta el final.\n- **B ✗** Es *replatform* (contenedores), no moderniza la arquitectura a microservicios.\n- **C ✗** Dividir primero los datos es la parte más riesgosa y acopla toda la migración.\n\n🔑 **Concepto clave:** Monolito → microservicios sin interrupciones = strangler fig (con ALB/API Gateway como fachada)."
   },
   {
     "id": 48,
@@ -1542,7 +1542,7 @@ window.ALL_QUESTIONS = [
     "correct": [
       "C"
     ],
-    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** **Guardrails** aplica controles **independientes del modelo**, tanto en la entrada del usuario como en la respuesta: filtros de contenido dañino, temas denegados, filtros de palabras y **PII (bloquear/enmascarar)**. Es una política gestionada y reutili"
+    "explanation": "**Respuesta correcta: C**\n\n**Por qué C es la mejor:** **Guardrails** aplica controles **independientes del modelo**, tanto en la entrada del usuario como en la respuesta: filtros de contenido dañino, temas denegados, filtros de palabras y **PII (bloquear/enmascarar)**. Es una política gestionada y reutilizable, con trazas para auditoría.\n\n**Por qué las otras no:**\n- **A ✗** Las instrucciones del *prompt* no son un control garantizado (inyección de prompts, desvíos del modelo).\n- **B ✗** Solo cubre la salida, es frágil, difícil de mantener y no filtra la entrada.\n- **D ✗** El ajuste fino no garantiza el cumplimiento, es costoso y se debe repetir por modelo.\n\n🔑 **Concepto clave:** Filtrado de contenido y cumplimiento en GenAI = Bedrock Guardrails."
   },
   {
     "id": 50,
