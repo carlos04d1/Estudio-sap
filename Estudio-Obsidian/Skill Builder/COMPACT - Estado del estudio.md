@@ -334,7 +334,7 @@ Los tres títulos genéricos llevan sufijo **`- Networking`** para no colisionar
 
 ## 9. Estado actual
 
-**Se completaron las sesiones de los siete módulos procesados del Learning Plan.** Seis módulos están formalmente cerrados al 100 % (*Multi-Account*, *Observability*, *Networking*, *Security*, *Operational Resilience* y ahora **Migration and Modernization** con sus 17 lecciones completadas y reto final 6/6), mientras que **Optimizing Hybrid Architectures** tiene sus 13 lecciones completas de contenido (a la espera del quiz integrador).
+**Se completaron las sesiones de los ocho módulos procesados del Learning Plan.** Ocho módulos están formalmente cerrados al 100 % (*Multi-Account*, *Observability*, *Networking*, *Security*, *Operational Resilience*, *Migration and Modernization*, *Designing Responsible AI Controls* con sus 5 lecciones completadas y Knowledge Check 10/10, y ahora **Integrating AI/ML Services into Architecture** con sus 11 lecciones y actividad integradora cerradas al 100 %), mientras que **Optimizing Hybrid Architectures** tiene sus 13 lecciones completas de contenido (a la espera del quiz integrador).
 
 | Módulo | Sesiones | Estado | Índice |
 | --- | --- | --- | --- |
@@ -345,16 +345,36 @@ Los tres títulos genéricos llevan sufijo **`- Networking`** para no colisionar
 | **Optimizing Hybrid Architectures** | **13** | `en-curso` | [[AWS Solutions Architect Advanced - Optimizing Hybrid Architectures]] |
 | **Operational Resilience** | **10** | `completo` | [[AWS Solutions Architect Advanced - Operational Resilience]] |
 | **Migration and Modernization** | **17** | `completo` | [[AWS Solutions Architect Advanced - Migration and Modernization]] |
+| **Integrating AI/ML Services into Architecture** | **11** | `completo` | [[AWS Solutions Architect Advanced - Integrating AI-ML Services into Architecture]] |
+| **Designing Responsible AI Controls** | **5** | `completo` | [[AWS Solutions Architect Advanced - Designing Responsible AI Controls]] |
 
-**Total de sesiones cargadas:** **100 sesiones** procesadas en el Learning Plan (hito centenario).
+**Total de sesiones cargadas:** **116 sesiones** procesadas en el Learning Plan (8 módulos completos; híbrido completo de contenido a la espera de quiz).
 
-**Siguiente paso:** El módulo **Migration and Modernization** ha quedado formalmente **`completo`** con **17 lecciones cargadas** y evaluadas al 100 % (01 a 17, culminando con [[Activity - Architecture Challenge - Migration]] que resuelve el caso AnyCompany Cookies con 6/6 aciertos). Con esta entrega, el repositorio de estudio para el **SAP-C02** alcanza el hito histórico de **100 sesiones**. El siguiente paso es verificar los contenidos o módulos restantes del *AWS Solutions Architect Advanced Learning Plan* (o labs asociados), o realizar el cierre formal y quiz de *Optimizing Hybrid Architectures*.
+**Siguiente paso:** Se completó formalmente el módulo **Integrating AI/ML Services into Architecture** con la **Lección 11** ([[Activity - Architecture Challenge - AI-ML]]: resolución de la crisis de AnyCompany Media y pipeline financiero de auditoría con S3 Object Lock, Athena y Glacier). El módulo está al 100 % cerrado a nivel de contenido. El siguiente paso es avanzar con el siguiente módulo del Learning Plan (o el quiz de Hybrid).
 
 ---
 
 ## 🔗 Relacionado
 
 - [[Guia AWS]] — guía oficial del examen
+- [[AWS Solutions Architect Advanced - Integrating AI-ML Services into Architecture]] — **módulo completado al 100 %** (11 sesiones: Bedrock multi-cuenta, RAG con OpenSearch Serverless, AgentCore, inferencia en SageMaker, pricing/Prompt Caching, Cross-Region, evaluaciones, observabilidad y capstone)
+- [[AWS Solutions Architect Advanced - Designing Responsible AI Controls]] — **módulo completado al 100 %** (IA Responsable, Bedrock Guardrails, AgentCore Identity, Step Functions HITL, gobernanza)
+- [[Course Overview - Designing Responsible AI Controls]] — lección 01 del módulo de IA Responsable (hoja de ruta: defensa en 3 capas)
+- [[Content Filtering and Compliance Controls]] — lección 02: los 6 componentes de Bedrock Guardrails, PII masking, limitación tool-use, Grounding vs Relevance y Automated Reasoning formal
+- [[Human Oversight and Approval Workflows]] — lección 03: supervisión humana con Step Functions, Task Tokens (.waitForTaskToken), Callbacks, Risk-Based Routing y unión de las 3 capas
+- [[Finished Architecture - Responsible AI Controls]] — lección 04: arquitectura final integrada, trazado del request a través de las 3 capas y composición según riesgo
+- [[Knowledge Check - Responsible AI Controls]] — evaluación final del módulo: 10/10 preguntas de escenario resueltas (100 %)
+- [[Course Overview - Integrating AI-ML Services into Architecture]] — lección 01 del módulo de IA/ML (hoja de ruta)
+- [[Gathering the Customer Requirements - AI-ML]] — lección 02: caso AnyCompany Media (3 use cases + 3 restricciones)
+- [[Multi-Account Bedrock Deployment Patterns]] — lección 03: patrones multi-cuenta, Assume-Role vs RBP y PrivateLink regional
+- [[RAG Architectures with Bedrock Knowledge Bases]] — lección 04: arquitectura RAG completa, OpenSearch Serverless, búsqueda híbrida y citas verificables
+- [[AI Agent Architectures]] — lección 05: arquitectura de agentes con Bedrock AgentCore, Gateway con Lambda y comparativa RAG vs Fine-Tuning vs Agentes
+- [[ML Inference Architectures with SageMaker AI]] — lección 06: las 4 opciones de inferencia en SageMaker (Real-Time, Serverless, Async, Batch Transform) y modelos propietarios vs Bedrock
+- [[Bedrock Pricing and Inference Optimization]] — lección 07: los 3 modelos de precios de Bedrock, Prompt Caching, dimensionamiento de PTUs y ausencia de spillover automático
+- [[Cross-Region Inference and Data Transfer Costs]] — lección 08: perfiles Cross-Region de Bedrock, enrutamiento $0 data transfer, perfiles Geográficos (GDPR) vs Globales y Route 53 LBR
+- [[Model Evaluation with Bedrock Evaluations]] — lección 09: los 3 métodos de evaluación (Automática, Model-as-a-Judge, Humana con Ground Truth), métricas cuantitativas y validación en CI/CD
+- [[Monitoring AI Workloads in Production]] — lección 10: las 4 señales operativas en CloudWatch, Model Invocation Logging en S3/Glacier, Data vs. Concept Drift y AgentCore Observability
+- [[Activity - Architecture Challenge - AI-ML]] — lección 11 (cierre): actividad integradora, resolución de crisis de AnyCompany Media y pipeline financiero con S3 Object Lock, Athena y Glacier
 - [[AWS Solutions Architect Advanced - Designing a Multi-Account Architecture]] — índice del módulo cerrado (10 sesiones)
 - [[AWS Solutions Architect Advanced - Implementing Observability and Management Controls]] — índice del módulo cerrado (20 sesiones)
 - [[AWS Solutions Architect Advanced - Designing Advanced Network Architectures]] — índice del módulo cerrado (12 sesiones)
