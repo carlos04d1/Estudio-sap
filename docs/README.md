@@ -4,7 +4,7 @@ Simulador de examen para la certificación **AWS Certified Solutions Architect -
 
 ## ✨ Características
 
-- 🎲 **Preguntas aleatorias sin repetición:** Cada examen toma por defecto **10 preguntas al azar** del banco de 50 preguntas. Cuenta con un sistema de ciclo inteligente que evita que te salgan preguntas ya vistas hasta haber completado las 50.
+- 🎲 **Preguntas aleatorias sin repetición:** Cada examen toma por defecto **10 preguntas al azar** del banco de 100 preguntas. Cuenta con un sistema de ciclo inteligente que evita que te salgan preguntas ya vistas hasta haber completado las 100.
 - ⚡ **Retroalimentación inmediata:** Al confirmar cada respuesta, sabes al instante si estás bien o mal, con el por qué detallado (justificación de la correcta, análisis de distractores y concepto clave 🔑).
 - 🌓 **Modo Claro y Oscuro:** Selector rápido con guardado automático de tu preferencia.
 - 📱 **Diseño Responsive Mobile-First:** Diseñado para estudiar cómodamente desde el móvil (botones grandes, opciones tipo tarjeta táctil, texto legible sin zoom molesto).
