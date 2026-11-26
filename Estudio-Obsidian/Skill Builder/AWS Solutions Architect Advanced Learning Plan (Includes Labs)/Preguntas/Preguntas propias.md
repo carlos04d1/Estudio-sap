@@ -59,10 +59,11 @@ A multinational enterprise operates 60 AWS accounts within an organization in AW
 
 ### Opciones de respuesta
 
-- A. Create VPC peering connections between all 60 VPCs in us-east-1 and all VPCs in eu-west-1. In each VPC, launch a cluster of EC2 instances running third-party firewall appliances behind an Application Load Balancer. Route all inter-VPC traffic through these local firewalls.
-- B. Deploy an AWS Transit Gateway in us-east-1 only. Share the Transit Gateway with all accounts in both Regions via AWS RAM. Deploy AWS Network Firewall in us-east-1. Route all European VPC traffic across an inter-region Direct Connect gateway to us-east-1 for inspection.
+- A. Create VPC peering connections between all 60 VPCs in us-east-1 and all VPCs in eu-west-1. In each VPC, deploy high-availability clusters of third-party stateful firewall virtual appliances on Amazon EC2 across multiple Availability Zones behind Network Load Balancers. Update local VPC route tables in all 60 accounts to point inter-VPC traffic to the firewalls, and establish inter-region peering connections between every individual VPC pair.
+- B. Deploy an AWS Transit Gateway in us-east-1 only. Share the Transit Gateway with all accounts across both Regions using AWS RAM. Deploy AWS Network Firewall in us-east-1 in a centralized inspection VPC. Configure an inter-region AWS Direct Connect gateway connection to route all European VPC traffic across trans-Atlantic private circuits into us-east-1 for deep packet inspection before sending to destination VPCs.
 - C. In each Region, deploy an AWS Transit Gateway in a dedicated Network account. Share the Transit Gateways with the organization using AWS RAM. In each Region, deploy AWS Network Firewall into a dedicated Inspection VPC attached to the regional Transit Gateway with appliance mode enabled. Peer the two Transit Gateways across Regions. Route inter-VPC traffic through the Inspection VPC in each Region before traversing the Transit Gateway peering connection.
-- D. In each Region, configure AWS PrivateLink endpoint services for each microservice. Create interface VPC endpoints in each VPC to connect to every other microservice. Use VPC Flow Logs and Amazon GuardDuty to fulfill the deep packet inspection requirement.
+- D. In each Region, configure AWS PrivateLink endpoint services for each microservice in every account. Deploy interface VPC endpoints in all 60 VPCs across both Regions to establish private connectivity between services. Configure VPC Flow Logs to publish to central Amazon CloudWatch Logs log groups, and enable Amazon GuardDuty and Amazon Detective to fulfill the deep packet inspection requirement.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -90,10 +91,11 @@ A financial institution is implementing a strict Data Perimeter strategy across 
 
 ### Opciones de respuesta
 
-- A. Configure an SCP that denies all s3 actions unless the request originates from specific VPC IDs. In each account, create IAM roles with permission boundaries that list every allowed S3 bucket ARN explicitly.
-- B. In S3 bucket policies, add a condition requiring aws:PrincipalOrgID matching the company's Organization ID. Configure VPC endpoint policies on all S3 gateway endpoints with a condition requiring aws:ResourceOrgID matching the Organization ID.
-- C. Deploy an AWS Network Firewall rule group that performs TLS inspection on all HTTPS calls to s3.amazonaws.com and drops any HTTP request headers that do not contain corporate session cookies.
-- D. In S3 bucket policies, use the aws:PrincipalArn condition listing all IAM users in the company. Configure an SCP denying s3:PutObject to any bucket without the tag Confidential:True.
+- A. Configure a Service Control Policy (SCP) attached to the organization root that denies all s3 actions unless the request originates from specific corporate VPC endpoint IDs. In each member account, create IAM roles with permission boundaries that explicitly list every allowed corporate Amazon S3 bucket ARN, updating the policies as new buckets are created.
+- B. In S3 bucket policies, add a condition requiring aws:PrincipalOrgID matching the company's Organization ID. Configure VPC endpoint policies on all S3 gateway endpoints with a condition requiring aws:ResourceOrgID matching the Organization ID, ensuring principals within the network cannot write to external buckets.
+- C. Deploy an AWS Network Firewall rule group across all VPC egress points that performs TLS decryption and deep packet inspection on all outbound HTTPS calls to s3.amazonaws.com. Configure stateful inspection rules that evaluate HTTP request headers and drop any requests that do not present valid corporate identity session tokens.
+- D. In all S3 bucket policies, add the aws:PrincipalArn condition explicitly listing all authorized IAM user and role ARNs across the 100 accounts. Configure an SCP on the organization root denying s3:PutObject and s3:GetObject to any S3 bucket that does not contain the mandatory resource tag Confidentiality:Corporate.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -122,9 +124,10 @@ A healthcare company has connected its on-premises data center to AWS through tw
 ### Opciones de respuesta
 
 - A. In a central Shared Services VPC connected to the Transit Gateway, create Route 53 Resolver inbound endpoints and outbound endpoints across multiple Availability Zones. Configure on-premises DNS forwarders for aws.example.com pointing to the inbound endpoint IPs. Create a Route 53 Resolver forwarding rule for corp.example.com pointing to on-premises DNS servers, and share the rule across the organization using AWS RAM. Associate the shared rule and Private Hosted Zones with all 80 VPCs.
-- B. Deploy custom BIND DNS servers on EC2 instances across multiple AZs in each of the 80 VPCs. Configure DHCP option sets in each VPC pointing to these local BIND servers. Configure zone transfers between BIND and on-premises Active Directory DNS servers over Direct Connect.
-- C. Deploy Route 53 Resolver inbound and outbound endpoints in all 80 VPCs. Create conditional forwarding rules in each VPC pointing directly to the on-premises DNS IP addresses over Direct Connect.
-- D. Associate the Route 53 Private Hosted Zone with the on-premises customer gateway router IP addresses using BGP route advertisements. Configure Route 53 Public Hosted Zones with latency routing for internal resolution.
+- B. Deploy custom BIND DNS servers on EC2 instances across multiple AZs in each of the 80 VPCs. Configure DHCP option sets in each VPC pointing to these local BIND servers. Configure zone transfers between BIND and on-premises Active Directory DNS servers over Direct Connect, and configure local conditional forwarding rules for both aws.example.com and corp.example.local to sync records continuously.
+- C. Deploy Route 53 Resolver inbound and outbound endpoints independently inside all 80 VPCs. In each individual VPC, create conditional forwarding rules for corp.example.com pointing directly to the on-premises DNS server IP addresses over Direct Connect, and associate the Private Hosted Zone for aws.example.com with each VPC route table using separate VPC endpoint policies.
+- D. Associate the Route 53 Private Hosted Zone for aws.example.com directly with the on-premises customer gateway router IP addresses using BGP community route advertisements over Direct Connect. Configure public Route 53 Hosted Zones with latency-based alias routing policies for corp.example.com to resolve corporate internal domain names across the AWS network.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -152,10 +155,11 @@ An enterprise manages 150 accounts under AWS Organizations. Corporate governance
 
 ### Opciones de respuesta
 
-- A. Create an SCP with an Allow effect specifying us-east-1 and us-west-2 under aws:RequestedRegion. Detach the default FullAWSAccess SCP from the organization root.
-- B. In AWS Control Tower, enable data residency guardrails only on the Core OU. Disable CloudTrail in all member accounts located outside us-east-1 and us-west-2.
-- C. In AWS Config, create an organization-wide rule that detects resources in unapproved Regions and triggers an AWS Systems Manager Automation document that runs ec2:TerminateInstances and s3:DeleteBucket.
-- D. Create an SCP with a Deny effect on all actions, with a condition using StringNotEquals on aws:RequestedRegion specifying us-east-1 and us-west-2, and add a condition using NotAction or StringNotLike for global services such as iam, organizations, route53, cloudfront, support, and wafv2.
+- A. Create an SCP with an Allow effect specifying us-east-1 and us-west-2 under the aws:RequestedRegion condition key. Detach the default FullAWSAccess SCP from the organization root to restrict all member accounts to only the specified Regions, and attach local IAM boundary policies to permit administrators access to global management services.
+- B. In AWS Control Tower, enable data residency guardrails exclusively on the Core OU. Disable AWS CloudTrail in all member accounts located outside us-east-1 and us-west-2, and configure an Amazon EventBridge rule in the management account to detect any API calls originating from unapproved regional endpoints.
+- C. In AWS Config, create an organization-wide rule that detects resources provisioned in unapproved Regions. Link the non-compliant rule events to an AWS Systems Manager Automation document that runs ec2:TerminateInstances and s3:DeleteBucket, and configure SNS alerts to notify compliance administrators of the termination.
+- D. Create an SCP with a Deny effect on all actions, with a condition using StringNotEquals on aws:RequestedRegion specifying us-east-1 and us-west-2, and add a condition using NotAction or StringNotLike for global services such as iam, organizations, route53, cloudfront, support, and wafv2. Attach the SCP to the organization root or work OUs.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -183,10 +187,11 @@ An online payment gateway processes millions of financial transactions daily acr
 
 ### Opciones de respuesta
 
-- A. Configure Amazon Route 53 with an active-passive failover routing policy pointing to the two ALBs. Set the record TTL to 10 seconds. Create Route 53 health checks associated with CloudWatch alarms in each Region.
-- B. Deploy AWS Global Accelerator with two static Anycast IP addresses. Create an endpoint group for us-east-1 and an endpoint group for us-west-2, attaching the respective regional Application Load Balancers. Configure health checks in Global Accelerator with an interval of 10 seconds and a threshold of 3 consecutive checks.
-- C. Deploy an Amazon CloudFront distribution with Origin Shield enabled. Configure an origin group with the primary ALB in us-east-1 and the secondary ALB in us-west-2 with 502/503/504 failover criteria.
-- D. Establish an AWS Site-to-Site VPN with BGP route propagation between the two Regions. Use ECMP to route traffic over the AWS backbone.
+- A. Configure Amazon Route 53 with an active-passive failover routing policy pointing to the two ALBs. Set the DNS record TTL to 10 seconds. Create Route 53 health checks associated with CloudWatch metric alarms in each Region to initiate regional traffic failover when the primary ALB reports sustained 5xx HTTP response codes.
+- B. Deploy AWS Global Accelerator with two static Anycast IP addresses. Create an endpoint group for us-east-1 and an endpoint group for us-west-2, attaching the respective regional Application Load Balancers. Configure health checks in Global Accelerator with an interval of 10 seconds and a threshold of 3 consecutive checks to automate failover.
+- C. Deploy an Amazon CloudFront distribution with Origin Shield enabled in us-east-1. Configure an origin group containing the primary ALB in us-east-1 and the secondary ALB in us-west-2 with 502/503/504 failover criteria, and configure CloudFront Functions to rewrite client request headers based on regional health.
+- D. Establish an AWS Site-to-Site VPN with BGP route propagation between the VPCs in both Regions. Use Equal-Cost Multi-Path (ECMP) routing to steer traffic across the AWS backbone, and configure internal Network Load Balancers in each Region to handle payment transactions with mutual TLS encryption.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -215,9 +220,10 @@ A regulated enterprise with 80 AWS accounts in AWS Organizations must centralize
 ### Opciones de respuesta
 
 - A. In the Log Archive account, create an S3 bucket with S3 Object Lock enabled in compliance mode with a 10-year default retention period. Create a KMS CMK with a key policy allowing cloudtrail.amazonaws.com to generate data keys. In the management account, create an organization trail with the IncludeGlobalServiceEvents and IsMultiRegionTrail flags enabled, pointing to the central S3 bucket in the Log Archive account and configured with the KMS CMK.
-- B. In the management account, create a central S3 bucket with S3 Versioning and S3 Lifecycle rules configured to transition objects to S3 Glacier Flexible Retrieval after 30 days and delete after 10 years. Encrypt the bucket with the default AWS managed key aws/s3.
-- C. In the Log Archive account, create an S3 bucket with S3 Object Lock in governance mode for 10 years. Attach an SCP to the organization root that denies s3:Delete actions on the log bucket ARN.
-- D. Configure Amazon CloudWatch Logs log groups in each account with a 10-year retention policy. Use CloudWatch metric filters to send all log events to Amazon Kinesis Data Firehose in the Log Archive account.
+- B. In the management account, create a central S3 bucket with S3 Versioning and S3 Lifecycle rules configured to transition objects to S3 Glacier Flexible Retrieval after 30 days and delete after 10 years. Encrypt the bucket with the default AWS managed key aws/s3, and create an organization trail with multi-Region logging enabled delivering to this central bucket.
+- C. In the Log Archive account, create an S3 bucket with S3 Object Lock configured in governance mode for a 10-year retention duration. Attach an SCP to the organization root that denies s3:Delete actions on the log bucket ARN, and configure individual CloudTrail trails in all 80 member accounts using AWS CloudFormation StackSets delivering logs to this central bucket.
+- D. Configure Amazon CloudWatch Logs log groups in each of the 80 member accounts with a 10-year retention policy. Use CloudWatch metric filters to send all log events to Amazon Kinesis Data Firehose in the Log Archive account, and configure Firehose to stream the records into an Amazon OpenSearch Service cluster with SSE-KMS encryption.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -245,10 +251,11 @@ A retail company hosts microservices across 50 production VPCs. All microservice
 
 ### Opciones de respuesta
 
-- A. In each of the 50 VPCs, deploy an AWS Network Firewall and a NAT Gateway in a public subnet. Configure Network Firewall domain allowlists locally in each VPC.
-- B. In each production VPC, create a VPC peering connection to a centralized Proxy VPC hosting an Auto Scaling group of Squid proxy instances. Route all traffic through the proxy instances.
-- C. In a dedicated Network Egress account, deploy a centralized Egress VPC connected to a regional AWS Transit Gateway. In the Egress VPC, launch AWS Network Firewall across multiple Availability Zones, with dedicated NAT Gateways in public subnets routing through an Internet Gateway. In the Transit Gateway route table, set the default route (0.0.0.0/0) to point to the Egress VPC attachment. In the Egress VPC route tables, route traffic from the Transit Gateway through the AWS Network Firewall endpoints before directing it to the NAT Gateways.
-- D. Attach an Internet Gateway to each production VPC. Configure egress-only Internet Gateways and security groups with outbound rules restricted to specific public IP addresses.
+- A. In each of the 50 production VPCs, deploy an AWS Network Firewall and an AWS NAT Gateway in a dedicated public subnet. Configure local VPC route tables with a default route (0.0.0.0/0) pointing to the NAT Gateway, and manage independent domain list rule groups inside each member account using customized CloudFormation templates.
+- B. In each production VPC, create a VPC peering connection to a centralized Proxy VPC in a Shared Services account. Deploy a fleet of Squid proxy servers on Amazon EC2 instances behind an internal Application Load Balancer in the Proxy VPC, and configure proxy client environment variables in all production instances to route HTTP and HTTPS traffic.
+- C. In a dedicated Network Egress account, deploy a centralized Egress VPC connected to the regional Transit Gateway. In the Egress VPC, launch AWS Network Firewall and NAT Gateways across multiple AZs. Configure Transit Gateway route tables to direct outbound 0.0.0.0/0 traffic to the Egress VPC. In AWS Network Firewall, configure stateful SNORT rule groups for domain filtering.
+- D. Attach an Internet Gateway directly to each production VPC across all 50 accounts. Configure egress-only Internet Gateways in the private subnets, apply strict Network ACLs blocking outbound traffic to all destinations except corporate IP ranges, and configure Amazon Route 53 Resolver DNS Firewall rules in each account to block unauthorized domains.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -276,10 +283,11 @@ An enterprise has 200 AWS accounts organized by project teams in AWS Organizatio
 
 ### Opciones de respuesta
 
-- A. In each of the 200 accounts, create custom IAM policies for each developer listing their allowed resources by ARN. Update the policies daily using an automated Lambda script reading from an S3 CSV file.
-- B. In IAM Identity Center, create one permission set for every CostCenter and Project combination. Assign users to the permission sets based on their Active Directory security groups.
-- C. In AWS Organizations, create an SCP that denies all access if the user's IAM role name does not match the tag on the EC2 instance or S3 bucket.
-- D. In IAM Identity Center, configure Attributes for access control to map the CostCenter and Project attributes from the IdP SAML assertion. Create a single consolidated IAM Identity Center permission set with a policy that allows actions conditioned on aws:PrincipalTag/CostCenter matching aws:ResourceTag/CostCenter and aws:PrincipalTag/Project matching aws:ResourceTag/Project. In the policy, add a Deny statement for tag:UntagResources and DeleteTags on resources where the tags match, and enforce aws:RequestTag conditions on resource creation APIs.
+- A. In the IT management account, deploy an AWS Service Catalog portfolio containing AWS CloudFormation templates with predefined IAM roles, security groups, and KMS keys. Share the portfolio with the entire organization using AWS Organizations integration. In each member account, assign launch constraints using local IAM roles with permission to provision the resources.
+- B. Create an AWS CloudFormation StackSet in the management account with self-managed permissions. Create an AWS Lambda function triggered by an Amazon EventBridge rule on account creation that automatically deploys a landing zone template with standard IAM roles and security groups in every new account across all supported Regions.
+- C. In each member account, create an IAM user for developers with permissions restricted by a permission boundary. Store pre-approved CloudFormation templates in a central Amazon S3 bucket in the management account, and grant member accounts read access through S3 bucket policies using the aws:PrincipalOrgID condition key.
+- D. Use AWS Control Tower to create Account Factory for Terraform (AFT). Configure a centralized pipeline that builds custom AMI images containing pre-configured security agents and network settings, and automatically shares these golden AMIs with all member accounts via Amazon EC2 Image Builder and AWS RAM.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -307,10 +315,11 @@ A digital media enterprise operates 40 AWS accounts under a single consolidated 
 
 ### Opciones de respuesta
 
-- A. In the AWS Billing and Cost Management console of the management account, navigate to Preferences and turn off discount sharing for all accounts in the Development OU. Keep discount sharing enabled between the FinOps account and accounts in the Production OU.
-- B. Create an SCP attached to the Development OU that denies ec2:RunInstances for any instance type covered by a Savings Plan or Reserved Instance.
-- C. Move the Development accounts out of the current AWS Organization into a completely separate standalone billing account without AWS Organizations.
-- D. In AWS Budgets, configure a budget action in each Development account that automatically stops EC2 instances when their usage exceeds 500 dollars per month.
+- A. In the AWS Billing console of the management account, navigate to Preferences and turn off discount sharing for all accounts in the Development OU. Keep discount sharing enabled between the FinOps account and accounts in the Production OU, ensuring Savings Plans and Reserved Instances apply strictly to production workloads.
+- B. Create an SCP attached to the Development OU that denies the ec2:RunInstances action for any EC2 instance type that matches the instance families covered by the corporate Savings Plans or Reserved Instances purchased by the FinOps account, forcing developers to use uncovered families.
+- C. Move all accounts in the Development OU out of the current AWS Organization into a completely separate standalone billing structure with individual credit cards and separate invoices, effectively eliminating consolidated billing and discount sharing across environments.
+- D. In AWS Budgets, configure an automated budget action for each account in the Development OU that automatically executes an SSM Automation document to stop all running EC2 instances whenever development usage exceeds a threshold of 500 USD per month.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -338,10 +347,11 @@ A global retail platform requires a multi-region active-active database layer ac
 
 ### Opciones de respuesta
 
-- A. Deploy Amazon Aurora PostgreSQL in us-east-1. Create an Aurora read replica in eu-west-1. In the application code, implement write-forwarding to send all write requests from Europe to the US endpoint.
-- B. Deploy an Amazon DynamoDB Global Table with replica tables in us-east-1 and eu-west-1. Configure each regional replica table to use a customer managed key (CMK) in its respective Region. The application in each Region writes to its local replica table.
-- C. Deploy DynamoDB tables in each Region. Deploy AWS Lambda functions triggered by DynamoDB Streams in both Regions to replicate changes bidirectionally across Regions using cross-region API calls.
-- D. Deploy Amazon DocumentDB Multi-Region clusters with bidirectional Apache Kafka replication deployed on Amazon EC2 instances across both Regions.
+- A. Deploy an Amazon DynamoDB Global Table with replica tables in us-east-1 and eu-west-1. Configure each regional replica table to use a customer managed key (CMK) in its respective Region. The application in each Region writes to its local replica table, and DynamoDB resolves conflicts automatically using the last-writer-wins rule.
+- B. Deploy Amazon Aurora PostgreSQL in us-east-1 as the primary cluster. Create an Aurora cross-region read replica in eu-west-1. In the application code, implement write-forwarding to send all write requests from Europe across trans-Atlantic connections to the US endpoint, while serving local reads from the replica.
+- C. Deploy standalone Amazon DynamoDB tables in each Region. Deploy AWS Lambda functions triggered by DynamoDB Streams in both Regions to replicate item mutations bidirectionally across Regions using cross-region API calls, implementing custom conflict resolution logic based on transaction sequence IDs.
+- D. Deploy Amazon DocumentDB Multi-Region clusters across us-east-1 and eu-west-1 with bidirectional Apache Kafka replication deployed on Amazon EC2 instances in both Regions, configuring Kafka Connect with SASL/SCRAM authentication to synchronize data with sub-second replication latency.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -372,10 +382,11 @@ A critical financial application uses an Amazon Aurora PostgreSQL cluster. The c
 
 ### Opciones de respuesta
 
-- A. Create a manual snapshot of the Aurora cluster. Restore the snapshot into a new cluster with the upgraded major version. Perform application testing and manually switch the application connection string to the new cluster.
-- B. Use AWS DMS to perform a full load and continuous replication to a newly provisioned Aurora cluster running the upgraded version. Drop the DMS task during the maintenance window and point the application to the new endpoint.
-- C. Use Amazon Aurora Blue/Green Deployments to create a green environment with the target major engine version. Perform validation on the green environment. Initiate switchover to the green environment, ensuring that the blue environment remains intact for rollback.
-- D. Modify the existing Aurora cluster in-place using the AWS CLI with the apply-immediately flag set to true. Monitor the upgrade through Amazon CloudWatch metrics.
+- A. Configure the ALB with an idle timeout of 60 seconds. Deploy AWS WAF on the ALB with a rate-based rule set to 10,000 requests per 5-minute period. Increase the Auto Scaling group maximum size to 200 instances and change the scaling metric to average CPU utilization with a 40% threshold to absorb traffic bursts.
+- B. Deploy an Amazon CloudFront distribution in front of the ALB. Configure the CloudFront distribution with an origin request policy that forwards all headers, query strings, and cookies, but caches responses for 60 seconds. Enable AWS Shield Advanced on the CloudFront distribution to mitigate volumetric load.
+- C. Deploy an Amazon Simple Queue Service (Amazon SQS) FIFO queue between the web tier and an asynchronous processing tier. Configure the web application to enqueue incoming requests immediately and return an HTTP 202 Accepted response with a polling token. Configure a target tracking scaling policy based on the SQS queue depth.
+- D. Replace the Application Load Balancer with a Network Load Balancer (NLB) operating in cross-zone load balancing mode. Configure Amazon ElastiCache for Redis behind the NLB to cache all incoming POST requests in memory, and configure the EC2 instances to poll Redis for new requests at a fixed rate of 10,000 items per minute.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -403,10 +414,11 @@ A travel booking portal operates on an Amazon EKS cluster in us-east-1. The port
 
 ### Opciones de respuesta
 
-- A. Provision a standby Amazon EKS cluster in eu-central-1. Deploy a GitOps operator in both clusters synchronizing deployments from the Git repository. Use Amazon Route 53 Application Recovery Controller (ARC) routing controls and health checks to govern automated traffic shifting between Regions.
-- B. Create an AWS Lambda function that triggers during a regional failure to execute aws eks create-cluster via the AWS CLI in eu-central-1 and deploys all application pods using kubectl.
-- C. Use AWS Backup to take hourly snapshots of the EKS cluster worker node EBS volumes in us-east-1. In the event of a disaster, restore the EBS volumes in eu-central-1 and launch new EC2 instances.
-- D. Deploy a single EKS cluster spanning worker nodes across both us-east-1 and eu-central-1 across an inter-region VPC peering connection. Configure pod topology spread constraints to balance replicas.
+- A. Deploy an Amazon Aurora Global Database with the primary DB cluster in us-east-1 and a secondary DB cluster in us-west-2. Deploy the application on Amazon EC2 instances in both Regions behind regional ALBs. Use Route 53 with a latency-based routing policy. In the event of an outage, promote the secondary cluster to primary using the Aurora console or AWS CLI.
+- B. Deploy Amazon RDS for PostgreSQL in us-east-1 with Multi-AZ enabled. Create a cross-region read replica in us-west-2. Configure an AWS Lambda function triggered by Route 53 health check failures to promote the cross-region read replica to standalone primary, update the application configuration, and perform DNS failover.
+- C. Deploy an Amazon Aurora PostgreSQL Multi-AZ cluster in us-east-1. Configure AWS Backup to take automated hourly snapshots of the Aurora cluster and copy them to us-west-2. In the event of a disaster, use an AWS CloudFormation template to restore the cluster from the latest snapshot in us-west-2 and launch the application fleet.
+- D. Deploy standalone Amazon Aurora PostgreSQL clusters in both us-east-1 and us-west-2. Use AWS Database Migration Service (AWS DMS) with continuous change data capture (CDC) to replicate data bidirectionally between both clusters. Use Amazon Route 53 weighted routing with equal weights to distribute traffic evenly across both Regions.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -434,10 +446,11 @@ An enterprise B2B service exposes a REST API to external corporate partners. To 
 
 ### Opciones de respuesta
 
-- A. Deploy an Application Load Balancer in public subnets with an mTLS listener. Route traffic directly to the private EC2 instances. Use AWS Systems Manager Parameter Store with an EC2 cron job to rotate database passwords.
-- B. Deploy an Amazon CloudFront distribution with AWS WAF attached. Configure CloudFront origin request policies to validate client certificates. Store database credentials in an S3 bucket encrypted with SSE-S3.
-- C. Configure a Network Load Balancer with TLS termination and pass client certificates to backend EC2 instances in HTTP headers. Configure AWS Secrets Manager to store credentials and use an EventBridge scheduled rule to trigger an EC2 reboot.
-- D. Deploy an Amazon API Gateway regional REST API with a custom domain name configured for mutual TLS (mTLS) using an S3 truststore. Associate an AWS WAF web ACL with the API Gateway. Configure a VPC Link from API Gateway to an internal Network Load Balancer in front of the private EC2 instances. Store database credentials in AWS Secrets Manager and enable automatic rotation using a pre-configured AWS Lambda rotation function.
+- A. Create an Amazon S3 bucket with S3 Versioning enabled. Configure a lifecycle rule to transition objects to S3 Glacier Flexible Retrieval after 30 days and to S3 Glacier Deep Archive after 90 days. Enable S3 Object Lock in governance mode with a retention period of 7 years, allowing administrators to modify retention settings if compliance mandates change.
+- B. Create an Amazon S3 bucket with S3 Versioning and S3 Object Lock enabled in compliance mode with a retention period of 7 years. Configure an S3 Lifecycle rule to transition objects to S3 Glacier Flexible Retrieval after 30 days and to S3 Glacier Deep Archive after 90 days. Restrict bucket policy permissions to prevent deletion before the retention period expires.
+- C. Deploy an Amazon S3 bucket and attach a bucket policy that denies s3:DeleteObject and s3:DeleteObjectVersion with a condition matching the current timestamp against the object creation date plus 7 years. Configure a lifecycle rule to transition objects to S3 Glacier Instant Retrieval after 30 days and S3 One Zone-IA after 90 days.
+- D. Create an AWS Backup backup vault with AWS Backup Vault Lock enabled in compliance mode. Configure a daily backup plan that copies files from an Amazon EFS file system to the vault, with a lifecycle rule to move recovery points to cold storage after 30 days and retain them for 7 years, disallowing early deletion by any user.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -465,10 +478,11 @@ An e-commerce platform processes high-priority order requests that must be proce
 
 ### Opciones de respuesta
 
-- A. Publish orders to an Amazon Kinesis Data Stream. Configure a Lambda event source mapping with a batch size of 10. Write custom application logic to check DynamoDB idempotency keys before processing each record.
-- B. Send orders to an Amazon SQS FIFO queue with a Dead Letter Queue (DLQ) configured with maxReceiveCount set to 5. Configure the Lambda event source mapping with ReportBatchItemFailures enabled. In the Lambda function, return the batchItemFailures list containing the message IDs of only the failed items.
-- C. Send orders to an Amazon SQS Standard queue. Configure a Lambda trigger with a batch size of 10. In the function catch block, delete all messages from the queue except the failed message ID.
-- D. Send orders to an Amazon SNS FIFO topic that fan-out to 10 standard SQS queues. Configure Lambda to process one queue per worker with exponential backoff retries.
+- A. In the application code, use the AWS SDK to retrieve credentials from AWS Systems Manager Parameter Store SecureString parameters at startup. Configure a Lambda function to rotate the credentials in both the database and Parameter Store every 30 days, and restart the EC2 instances through SSM Run Command to pick up the new credentials.
+- B. Store the database credentials in AWS Secrets Manager. Configure automatic rotation for the secret every 30 days using the built-in Secrets Manager rotation Lambda function for Aurora MySQL. Update the application to retrieve the credentials from Secrets Manager using the caching client library and attach an IAM role to the EC2 instances granting secretsmanager:GetSecretValue.
+- C. Enable IAM database authentication on the Amazon Aurora MySQL DB cluster. Modify the application code to generate IAM database authentication tokens dynamically using the AWS SDK for each new database connection. Grant the EC2 instance profile an IAM policy allowing rds-db:connect to the specific database user.
+- D. Store database credentials encrypted with AWS KMS customer managed keys (CMK) inside the EC2 instance user data script. Configure a monthly CloudWatch alarm that invokes an AWS Step Functions state machine to update the user data script, rotate the database password, and execute an AMI rolling deployment of the Auto Scaling group.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -496,10 +510,11 @@ A biotechnology research institute runs genomic sequencing workloads on a cluste
 
 ### Opciones de respuesta
 
-- A. Deploy an Amazon FSx for Lustre persistent file system linked to the Amazon S3 bucket with an automated data repository association (DRA) to import and export changes. Mount the FSx for Lustre file system across all EC2 worker instances.
-- B. Deploy an Amazon Elastic File System (EFS) file system with General Purpose performance mode and provisioned throughput. Mount the EFS file system via NFS on all instances and run an rsync script to transfer files to S3.
-- C. Create an Amazon EBS Provisioned IOPS SSD (io2 Block Express) volume of 64 TB. Attach the EBS volume to an EC2 instance and share it with the cluster using a Samba Windows share.
-- D. Configure EC2 instances with local NVMe Instance Store SSDs. Write a custom daemon that continuously downloads objects from S3 using the AWS CLI and uploads results using multipart uploads.
+- A. Deploy the web tier into a public subnet and the application tier into a private subnet within the same VPC. Configure Security Group rules on the application tier to allow inbound traffic only from the web tier Security Group ID. Configure Network ACLs on the private subnet to allow inbound traffic from the public subnet CIDR block only.
+- B. Create two separate VPCs: a Web VPC and an App VPC. Establish a VPC peering connection between the two VPCs. In the App VPC, configure the application tier Security Group to reference the Web VPC security group ID as the source for inbound traffic on the application port, and update the route tables accordingly.
+- C. Deploy the web tier in a public subnet and the application tier in a private subnet. Create an AWS Network Firewall endpoint in an inspection subnet between the two tiers. Configure stateful 5-tuple firewall rules to inspect all traffic between the web subnet and application subnet, and disable intra-VPC route propagation.
+- D. Deploy the application tier behind an internal Application Load Balancer. In the web tier, configure AWS WAF rules to inspect outbound traffic heading to the application tier. Configure an AWS PrivateLink endpoint service for the internal ALB and establish interface VPC endpoints in the web tier subnets.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -527,10 +542,11 @@ A digital photography company processes over 500,000 raw image uploads daily. Th
 
 ### Opciones de respuesta
 
-- A. Configure an S3 event notification to trigger AWS Lambda functions for all images. Run the Lambda functions with maximum memory (10,240 MB) and configure Provisioned Concurrency to absorb peak hours.
-- B. Deploy Amazon EKS worker nodes on EC2 On-Demand instances using an Auto Scaling group managed by the Kubernetes Cluster Autoscaler with a fixed minimum size of 20 instances. Store all images in S3 Standard.
-- C. Configure S3 event notifications to send upload events to an Amazon SQS queue. In the EKS cluster, deploy Karpenter to automatically provision EC2 Spot instances using diverse instance types based on queue depth. Store raw images in Amazon S3 with an S3 Lifecycle rule to transition objects to S3 Intelligent-Tiering immediately.
-- D. Purchase 3-year EC2 Reserved Instances for the peak evening capacity. Configure the worker pods with static CPU requests and deploy them on dedicated EC2 hosts.
+- A. Deploy a fleet of Amazon EC2 c5n.18xlarge instances in an Auto Scaling group distributed across three Availability Zones. Configure an Amazon EFS file system with Provisioned Throughput mode mounted across all instances. Use TCP communication for inter-node MPI messaging and configure jumbo frames (MTU 9000) on all network interfaces.
+- B. Deploy Amazon EC2 instances with Elastic Fabric Adapter (EFA) enabled within a cluster placement group in a single Availability Zone. Use an Amazon FSx for Lustre file system linked to an Amazon S3 bucket for high-performance parallel POSIX storage, and execute the MPI jobs using the Libfabric interface.
+- C. Use AWS Batch with AWS Fargate compute environments configured with maximum vCPU and memory allocations. Configure an Amazon FSx for OpenZFS file system attached to the Fargate tasks, and configure AWS Step Functions to orchestrate parallel map tasks across 10,000 concurrent containers in multiple Regions.
+- D. Deploy Amazon EC2 instances within a spread placement group across multiple Availability Zones to ensure physical hardware isolation. Attach Amazon EBS io2 Block Express volumes with 256,000 IOPS to each instance, and configure an internal Network Load Balancer with cross-zone load balancing to distribute MPI network packets.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -558,10 +574,11 @@ An enterprise has a global cloud footprint across 4 AWS Regions and 6 on-premise
 
 ### Opciones de respuesta
 
-- A. Deploy a mesh of VPC peering connections across all Regions and accounts. Use Security Groups in each VPC with IP prefix lists to restrict traffic between Development and Production CIDRs.
-- B. Deploy AWS Cloud WAN with a global central network. Define segments for Production, Development, and SharedServices in a central core network policy document. Configure routing rules within the policy to allow Production and Development to route only to SharedServices while isolating them from each other. Attach regional VPCs and Direct Connect gateways to the appropriate core network segments.
-- C. Deploy an AWS Transit Gateway in each Region. Peer all Transit Gateways together in a full mesh. In each Transit Gateway, create separate route tables for Production and Development. Use AWS Systems Manager to manually copy route table entries between Regions.
-- D. Deploy an AWS Network Firewall in every VPC. Configure firewall rules locally in each account to block any traffic originating from the Development CIDR block.
+- A. Deploy an Amazon CloudFront distribution in front of the Application Load Balancer. Configure CloudFront origin request policies to cache static media files at CloudFront Edge locations. Configure CloudFront with AWS WAF rate-based rules to protect against traffic spikes, and configure origin shield in the nearest Region to reduce origin load.
+- B. Deploy AWS Global Accelerator and create an accelerator with two static Anycast IP addresses. Create an endpoint group for the AWS Region where the Application Load Balancer is deployed and attach the ALB as the endpoint. Configure client applications to connect to the Global Accelerator Anycast IP addresses instead of the ALB DNS name.
+- C. Configure Amazon Route 53 with an IP-based routing policy that maps client IP ranges to the closest AWS Region. Configure AWS Direct Connect connections with public virtual interfaces in major metropolitan centers worldwide, and route global internet traffic over the Direct Connect connections directly to the ALB.
+- D. Deploy an Application Load Balancer in each major geographical AWS Region. Configure inter-region VPC peering between all regional VPCs and the primary application VPC. In Amazon Route 53, configure a latency-based routing policy pointing to the regional ALBs, and enable cross-zone load balancing on all target groups.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -589,10 +606,11 @@ A banking institution is designing an event-driven architecture that ingests fin
 
 ### Opciones de respuesta
 
-- A. Deploy an Amazon API Gateway in both Regions that writes events directly to an Amazon Kinesis Data Stream in each Region. Use a Route 53 latency record pointing to the API Gateways.
-- B. Create a custom Amazon EventBridge event bus in each Region. Configure an AWS Lambda function on a schedule that tests the bus and updates Route 53 DNS records using the AWS SDK if failures are detected.
-- C. Deploy an Amazon SQS queue in each Region. Configure an Application Load Balancer in each Region to forward events to the local SQS queue, and use VPC Peering to synchronize the queues.
-- D. Create an Amazon EventBridge global endpoint that spans event buses in us-east-1 and us-west-2. Configure an Amazon Route 53 health check to monitor the health of the primary bus and manage automatic failover. Direct the mobile clients to publish events to the EventBridge global endpoint.
+- A. Store API keys as plain-text secrets in AWS Systems Manager Parameter Store. Configure Amazon API Gateway with an AWS Lambda authorizer that retrieves all API keys from Parameter Store on every request and validates the incoming Authorization header against the cached in-memory dictionary.
+- B. Use Amazon API Gateway usage plans and API keys. Associate each client's API key with a usage plan that defines the required throttling rate (requests per second) and burst limits. Require clients to pass the x-api-key header in all requests, and attach an Amazon Cognito user pool authorizer to manage authentication.
+- C. Deploy an AWS WAF Web ACL associated with the Amazon API Gateway stage. Create a rate-based rule for each client that inspects the client's source IP address and blocks requests exceeding 1,000 requests per 5-minute evaluation period. Configure AWS Shield Advanced to absorb layer 7 distributed denial-of-service traffic.
+- D. Configure an Amazon SQS FIFO queue in front of the API Gateway integrations. Configure client applications to submit requests with their API key as a message attribute. Use an AWS Lambda consumer function that processes messages at a throttled rate per client key and writes responses back to individual client S3 buckets.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -620,10 +638,11 @@ A gaming platform requires an in-memory data store for live player sessions and 
 
 ### Opciones de respuesta
 
-- A. Amazon MemoryDB for Redis
-- B. Amazon ElastiCache for Memcached with Multi-AZ
-- C. Amazon DynamoDB with DynamoDB Accelerator (DAX)
-- D. Amazon RDS for PostgreSQL with an in-memory tempfs storage engine
+- A. Deploy Amazon ElastiCache for Memcached with 10 nodes distributed across multiple Availability Zones. Configure the application to use the Memcached auto-discovery mechanism, and implement consistent hashing in the application client to distribute cached database queries evenly across all nodes.
+- B. Deploy an Amazon DynamoDB table in front of the PostgreSQL database. Use AWS Database Migration Service (AWS DMS) with continuous change data capture (CDC) to stream updates from PostgreSQL to DynamoDB. Configure the application to read exclusively from DynamoDB and write to PostgreSQL.
+- C. Deploy an Amazon ElastiCache for Redis (cluster mode enabled) replication group across multiple Availability Zones with automatic failover and read replicas. Configure the application with a cache-aside strategy: query ElastiCache first; on a cache miss, query PostgreSQL and populate ElastiCache with a TTL; update or invalidate the cache on database writes.
+- D. Deploy Amazon CloudFront in front of the PostgreSQL database using an internal Network Load Balancer as the custom origin. Configure CloudFront with a caching policy that caches SQL query responses for 300 seconds, and configure an AWS Lambda@Edge function to parse SQL statements and generate cache keys.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -651,10 +670,11 @@ An online catalog application uses an Amazon OpenSearch Service domain in us-eas
 
 ### Opciones de respuesta
 
-- A. Schedule hourly automated snapshots of the primary OpenSearch domain to an S3 bucket in us-east-1. Use S3 Cross-Region Replication (CRR) to copy the snapshots to us-west-2. Restore the domain from the snapshot when a disaster occurs.
-- B. Configure an Amazon Kinesis Data Firehose delivery stream in us-east-1 with dual endpoints that write concurrently to both OpenSearch domains.
-- C. Set up an Amazon OpenSearch Service domain in us-west-2. Establish a cross-cluster connection between the two domains and configure Cross-Cluster Replication (CCR) for the relevant indexes. In the secondary domain, monitor the replication lag and use the follower indexes for immediate read failover.
-- D. Deploy an AWS Lambda function triggered by Amazon CloudWatch Logs to read data from the primary OpenSearch domain and index it into the secondary domain.
+- A. Create an Amazon S3 Lifecycle rule to transition objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days and to S3 Glacier Flexible Retrieval after 90 days. Configure S3 Intelligent-Tiering for all incoming objects and set an expiration rule to permanently delete all objects after 365 days.
+- B. Create an Amazon S3 Lifecycle rule that transitions objects to S3 Standard-Infrequent Access (S3 Standard-IA) after 30 days and transitions objects to S3 Glacier Deep Archive after 90 days. Keep expiration rules disabled to ensure data is retained indefinitely according to corporate archival policy.
+- C. Create an Amazon S3 Lifecycle rule that transitions objects directly to S3 Glacier Instant Retrieval after 30 days and to S3 One Zone-IA after 90 days. Configure S3 Batch Operations to periodically move files smaller than 128 KB back to S3 Standard to avoid minimum storage charges.
+- D. Deploy an AWS Lambda function triggered by Amazon EventBridge scheduled rules every 24 hours. Use the Lambda function to scan S3 bucket inventory reports, calculate the age of each object, and copy objects older than 30 days to S3 Glacier Deep Archive using the Amazon S3 PutObject API with a Glacier storage class header.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -685,10 +705,11 @@ A security audit across 80 accounts in AWS Organizations revealed hundreds of un
 
 ### Opciones de respuesta
 
-- A. Create an IAM policy attached to all IAM users that denies ec2:RunInstances unless the Encrypted:true parameter is present. Manually detach and re-encrypt existing volumes during the weekend.
-- B. Enable default EBS encryption in each Region across all accounts using AWS Systems Manager Quick Setup or an organization-wide script, configured with the regional KMS CMK. Create an SCP that denies ec2:RunInstances if the volume is unencrypted. For existing unencrypted volumes, use AWS Systems Manager Automation to automate snapshot creation, snapshot copy with KMS CMK encryption, and volume replacement during maintenance windows.
-- C. Deploy AWS KMS key policies with conditions denying ec2:CreateVolume if encryption is disabled. Rely on Amazon Macie to detect unencrypted EBS volumes.
-- D. In AWS Config, enable an automatic remediation action that immediately terminates any EC2 instance attached to an unencrypted EBS volume.
+- A. Migrate the promotional clickstream data stream to Amazon SQS FIFO queues with provisioned message deduplication IDs. Configure the GPS data stream to use Amazon Kinesis Data Streams in on-demand mode. Create separate cost allocation tags on each queue and stream, and analyze costs using AWS Cost Explorer.
+- B. Configure the GPS data stream to use Amazon Kinesis Data Streams in provisioned mode with an appropriate shard count. Configure the promotional clickstream data stream to use Amazon Kinesis Data Streams in on-demand mode. Apply unique cost allocation tags to each data stream, and activate the tags in the AWS Billing console for independent cost tracking.
+- C. Configure both data streams to use Amazon Kinesis Data Streams in provisioned capacity mode. Configure an Application Auto Scaling policy on the promotional stream that scales shard capacity up based on incoming bytes metrics, and configure a scheduled scaling policy to handle marketing campaign windows.
+- D. Configure both data streams to use Amazon Managed Streaming for Apache Kafka (Amazon MSK) with tiered storage enabled. Deploy a 3-broker cluster across multiple Availability Zones, and use separate Kafka topics for GPS and clickstream data. Track costs by analyzing broker disk utilization metrics in CloudWatch.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -716,10 +737,11 @@ A microservices application running on AWS Lambda functions interacts with an Am
 
 ### Opciones de respuesta
 
-- A. Increase the max_connections parameter in the Aurora DB parameter group to the maximum allowed limit and upgrade the DB instance size to a larger instance class.
-- B. Migrate the application from AWS Lambda to Amazon EC2 instances running inside an Auto Scaling group with connection pooling configured in the application server.
-- C. Deploy an Amazon DynamoDB table in front of Aurora to buffer all database queries, and use a scheduled cron Lambda to flush changes to Aurora.
-- D. Deploy an Amazon RDS Proxy between the AWS Lambda functions and the Amazon Aurora PostgreSQL cluster. Configure Lambda functions to connect to the RDS Proxy endpoint instead of the direct database endpoint.
+- A. Deploy an Amazon EC2 Auto Scaling mixed instances group. Use 20% On-Demand Instances as the base capacity and Spot Instances for the remaining 80% of capacity. Configure the application to store processing checkpoints in Amazon DynamoDB every 10 minutes. Resume processing from the last checkpoint if Spot Instances are interrupted.
+- B. Deploy the application on 100% Spot Instances across multiple Availability Zones using the capacity-optimized allocation strategy. Attach Amazon EBS io2 Block Express volumes to each instance to store the application state locally, and configure EBS fast snapshot restore to recover state upon Spot interruption.
+- C. Purchase 1-year Standard Reserved Instances for 100% of the cluster capacity with no upfront payment. Configure the batch processing application to store intermediate state on an Amazon EFS file system with Provisioned Throughput mode mounted across all instances.
+- D. Use AWS Batch with an unmanaged compute environment consisting of On-Demand Instances. Configure the application to store processing checkpoints in an Amazon S3 bucket using multipart uploads every 30 minutes, and re-launch the entire batch job from the beginning if any single instance fails.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -747,10 +769,11 @@ A legacy web application runs on four Amazon EC2 instances behind an Application
 
 ### Opciones de respuesta
 
-- A. Refactor the application to store session state externally in an Amazon DynamoDB table or Amazon ElastiCache cluster. Deploy the EC2 instances across multiple Availability Zones inside an Auto Scaling group with scaling policies based on CPU utilization and target tracking.
-- B. Enable sticky sessions (session affinity) on the Application Load Balancer target group and increase the idle timeout to 3600 seconds. Add two more EC2 instances in the same Availability Zone.
-- C. Configure Elastic Block Store (EBS) Multi-Attach on an io2 volume and share the memory state file system across all four EC2 instances.
-- D. Use AWS Application Migration Service to convert the EC2 instances into a single high-memory bare-metal EC2 instance with 99.99% hardware reliability.
+- A. In AWS Compute Optimizer, export the rightsizing recommendations report for the organization. Run an automated AWS Systems Manager Automation runbook that immediately downsizes all flagged EC2 instances, reduces EBS volume sizes by 50%, and switches all RDS DB instances to Burstable (t4g) instance types across all accounts.
+- B. In the management account, enable AWS Compute Optimizer for the entire AWS Organization. Install the Amazon CloudWatch unified agent on all EC2 instances to collect memory metrics (mem_used_percent). Review Compute Optimizer recommendations in the management account, filter by projected cost savings, and apply rightsizing recommendations during planned maintenance windows.
+- C. In AWS Trusted Advisor, review the Low Utilization Amazon EC2 Instances check across all member accounts. Deploy an Amazon EventBridge rule in each account that runs a Lambda function every weekend to stop any EC2 instance whose average CPU utilization remained below 20% during the preceding 7 days.
+- D. Purchase 3-year Compute Savings Plans for the entire historical baseline spend across all 50 accounts. Because Compute Savings Plans apply automatically to EC2, Fargate, and Lambda usage regardless of instance size or utilization, rightsizing individual resources is unnecessary.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -778,10 +801,11 @@ An enterprise operates 2,000 Amazon EC2 instances, 500 EBS volumes, and 300 Lamb
 
 ### Opciones de respuesta
 
-- A. Deploy custom Python scripts on cron schedules in every account that invoke the DescribeInstances API and calculate average metrics. Store the JSON output in an S3 bucket.
-- B. Configure Amazon CloudWatch anomaly detection on every EC2 instance metric and set up CloudWatch alarms that trigger AWS Lambda functions to stop underutilized instances.
-- C. Enable AWS Compute Optimizer in the management account for the entire organization. Configure export of Compute Optimizer recommendations to a centralized Amazon S3 bucket in a FinOps account, and visualize the findings using Amazon QuickSight.
-- D. In AWS Cost Explorer, manually generate monthly Rightsizing Reports for each individual member account and download CSV spreadsheets.
+- A. In the AWS Billing and Cost Management console of the management account, enable AWS Cost Anomaly Detection with a separate monitor for each AWS account. Configure an alert subscription with an immediate threshold of 100 USD that sends email notifications to the cloud operations team and publishes to an Amazon SNS topic.
+- B. Create an Amazon CloudWatch billing alarm in us-east-1 in the management account based on the EstimatedCharges metric. Configure the alarm threshold to 10% above the previous month's total bill, and configure the alarm action to trigger an Amazon SNS notification to the operations team.
+- C. In AWS Budgets, create a cost budget for each account with a threshold set to 120% of historical average spend. Configure the budget to trigger a Budget Action that applies an SCP denying ec2:RunInstances and rds:CreateDBInstance whenever the budget threshold is breached.
+- D. Configure a recurring daily Amazon Athena query on the AWS Cost and Usage Report (CUR) stored in Amazon S3. When the query detects a cost variance greater than 15% between consecutive days for any service, invoke an AWS Lambda function that posts an alert to a company Slack channel.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -809,10 +833,11 @@ An enterprise manages a hybrid fleet of 600 Linux and Windows servers operating 
 
 ### Opciones de respuesta
 
-- A. Configure Ansible Tower on an EC2 instance in a public subnet. Install OpenSSH on all Windows and Linux on-premises servers and execute patch playbooks over the public Internet.
-- B. Install the AWS Systems Manager Agent (SSM Agent) on all on-premises servers and EC2 instances, registering on-premises machines as managed instances with hybrid activations. Configure Systems Manager Patch Manager with custom patch baselines for Linux and Windows. Use Systems Manager Maintenance Windows to schedule automated patch deployment and view compliance in the Systems Manager Compliance dashboard.
-- C. Use AWS Systems Manager Run Command to manually execute shell scripts and PowerShell commands on all instances on the first weekend of every month.
-- D. Deploy AWS CodeDeploy agents on all servers. Create deployment groups for each operating system and push OS patch packages using CodePipeline.
+- A. Convert the existing Aurora MySQL cluster to an Aurora Serverless v2 cluster. Set the minimum capacity to 0.5 ACUs and the maximum capacity to 128 ACUs. Because Aurora Serverless v2 scales down instantly during periods of zero traffic, read replicas are not required to meet cost and availability requirements.
+- B. Deploy an Amazon Aurora Serverless v2 cluster with a primary writer instance and an Aurora Serverless v2 reader instance configured in a second Availability Zone for high availability. Set the minimum ACUs to 0.5 and the maximum ACUs to 64. Configure the application to use the Aurora cluster endpoint for writes and the reader endpoint for reads.
+- C. Deploy an Amazon RDS for MySQL Multi-AZ DB instance with an db.r6g.4xlarge instance type. Purchase a 1-year Standard Reserved DB Instance to minimize hourly costs. Configure an Application Auto Scaling scheduled policy to scale the instance type down to db.t4g.medium during the 8-hour low-traffic periods every night.
+- D. Deploy an Amazon DynamoDB table with on-demand capacity mode. Use AWS Database Migration Service (AWS DMS) to replicate data continuously from Aurora to DynamoDB. Configure the reporting microservice to read from DynamoDB, and shut down the Aurora database cluster during the 8-hour low-traffic window.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -840,10 +865,11 @@ A financial company operates 70 AWS accounts in AWS Organizations. The company m
 
 ### Opciones de respuesta
 
-- A. In each account, configure Amazon OpenSearch Service to ingest VPC Flow Logs and CloudTrail logs. Write custom Python query scripts to compare IP addresses against open-source threat intelligence lists.
-- B. Enable Amazon Macie in all accounts and configure an AWS Lambda function to stop EC2 instances when sensitive data is exposed.
-- C. Configure AWS WAF in each account and configure rate-based rules to block IP addresses generating abnormal outbound HTTP traffic.
-- D. In the AWS Organizations management account, designate a security account as the delegated administrator for Amazon GuardDuty. Enable GuardDuty for all member accounts with automated enablement for future accounts. Configure an Amazon EventBridge rule in the security account that listens for GuardDuty findings of high severity and triggers an AWS Step Functions workflow to isolate the compromised EC2 instance by attaching a quarantine security group and revoke active IAM sessions.
+- A. In AWS Systems Manager Parameter Store, store the allowed VPC CIDR blocks in a parameter list. Configure a nightly Lambda function that runs describe-vpcs across all accounts, compares VPC CIDRs against the allowed list, and automatically terminates any VPC containing overlapping IP address ranges.
+- B. Deploy an Amazon DynamoDB table in a central networking account to maintain an IP address registry. Configure an AWS Service Catalog product for VPC creation that invokes an AWS Lambda custom resource to query DynamoDB, allocate an available CIDR block, and register the new VPC allocation atomically.
+- C. Use Amazon VPC IP Address Manager (IPAM). Create an IPAM instance in a delegated administrator account and share it with the organization via AWS RAM. Define top-level and regional pools with non-overlapping CIDR blocks. Configure IPAM allocation rules and netmask constraints, and require member accounts to provision VPCs from the IPAM pools.
+- D. Create an SCP on the organization root that specifies an Allow effect on ec2:CreateVpc only if the request contains an aws:RequestTag/NetworkApproved tag. In each account, require network engineers to manually review VPC creation requests and apply the tag only after verifying that the requested CIDR does not overlap.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -871,10 +897,11 @@ An online retail application is built using a microservices architecture running
 
 ### Opciones de respuesta
 
-- A. Instrument the application microservices using the AWS X-Ray SDK or AWS Distro for OpenTelemetry (ADOT). Enable active tracing on the Lambda functions and ECS task definitions. Use the AWS X-Ray Service Map and trace analysis to identify latency distribution and pinpoint downstream bottlenecks in the request path.
-- B. Increase the provisioned read and write capacity on all DynamoDB tables to 10,000 RCU/WCU and turn on DynamoDB Streams.
-- C. Enable Amazon CloudWatch Detailed Monitoring on all underlying EC2 instances and configure VPC Flow Logs with 1-minute aggregation intervals.
-- D. Configure Amazon CloudWatch Synthetics canaries to send checkout requests every minute and record HTTP response codes in an Amazon S3 bucket.
+- A. In the management account, enable AWS IAM Access Analyzer for the entire organization with an unused access analyzer. Configure a 90-day tracking period to identify unused IAM roles, access keys, and permissions. Use the IAM Access Analyzer policy generation feature with CloudTrail logs to generate right-sized, least-privilege replacement policies.
+- B. Deploy a custom AWS Lambda function in each of the 60 accounts using AWS CloudFormation StackSets. Schedule the function to run monthly, download the IAM credential report, analyze the password_last_used and access_key_1_last_used fields, and delete any IAM role that has not been assumed within the last 90 days.
+- C. In AWS Security Hub, review the findings generated by the CIS AWS Foundations Benchmark standard related to IAM credentials. Deploy an automated remediation action using AWS Systems Manager Automation that revokes active sessions and attaches an inline Deny policy to any IAM role flagged as non-compliant by Security Hub.
+- D. Enable Amazon GuardDuty in each member account with IAM protection enabled. Create an Amazon EventBridge rule that detects any IAM entity exhibiting anomalous API activity or attempting to use unused administrative permissions, and trigger an AWS Step Functions workflow that immediately deletes the over-permissive IAM policies.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -902,10 +929,11 @@ An analytics platform ingests 50 TB of telemetry log files daily into an Amazon 
 
 ### Opciones de respuesta
 
-- A. Keep objects in S3 Standard for 7 days. Transition objects to S3 Standard-Infrequent Access (S3 Standard-IA) at day 8. Transition objects to S3 Glacier Flexible Retrieval at day 90. Configure a rule to abort incomplete multipart uploads after 7 days.
-- B. Keep objects in S3 Standard for 90 days. Transition objects to S3 Glacier Deep Archive at day 91. Delete incomplete multipart uploads manually using the AWS CLI.
-- C. Keep objects in S3 Standard for 7 days. Transition objects to S3 Glacier Instant Retrieval at day 8. Transition objects to S3 Glacier Deep Archive at day 90. Configure an S3 Lifecycle rule to abort incomplete multipart uploads after 7 days.
-- D. Transition all objects immediately upon ingestion to S3 Glacier Instant Retrieval. Configure S3 Object Lock in compliance mode for 7 years.
+- A. Deploy an Amazon CloudWatch agent on each web server instance to tail the Apache/Nginx access logs and stream them to CloudWatch Logs. Configure CloudWatch metric filters to count HTTP 4xx and 5xx error rates, and configure an alarm that triggers an Auto Scaling policy when error counts exceed 100 within a 1-minute window.
+- B. Deploy Amazon CloudWatch Synthetics canaries that continuously send HTTP GET and POST requests to the web application endpoints every 1 minute. Configure the canaries to take screenshots and validate response status codes. Create CloudWatch composite alarms on canary failure metrics that notify the operations team via Amazon SNS.
+- C. Enable VPC Flow Logs on all subnets hosting the web application instances, publishing records to Amazon S3. Configure an Amazon Athena workgroup with scheduled queries running every 5 minutes to identify dropped TCP connections, and invoke an AWS Lambda function to publish alerts to an Amazon SNS topic.
+- D. Deploy AWS X-Ray daemon on all web server instances and instrument the web application code with the AWS X-Ray SDK. Configure X-Ray sampling rules to record 100% of all user transactions. Configure AWS Lambda functions to continuously poll the X-Ray GetTraceSummaries API and alert on latency regressions.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -933,10 +961,11 @@ A security audit identifies that EC2 instances in an application VPC could be le
 
 ### Opciones de respuesta
 
-- A. Deploy custom DNS proxies on EC2 instances running dnsmasq. Point the DHCP option set of the VPC to the EC2 proxies and configure regex domain blocking in custom config files.
-- B. Configure Route 53 Resolver DNS Firewall. Create a rule group using the AWS Managed Domain Lists (MalwareDomains and BotnetCommandandControlDomains) with the BLOCK action, and associate the rule group with the VPC.
-- C. Configure AWS WAF with rate-based rules and associate it directly with the Route 53 Private Hosted Zone.
-- D. Modify all Security Groups attached to EC2 instances to deny outbound UDP and TCP traffic on port 53.
+- A. Deploy AWS Network Firewall with TLS inspection enabled. Use a stateful rule group that intercepts all HTTPS calls to dynamodb.us-east-1.amazonaws.com and inspects HTTP request headers to verify that the requesting principal matches an authorized IAM role ARN before allowing packets through to the service endpoint.
+- B. In each VPC, create a gateway VPC endpoint for Amazon DynamoDB. Attach an endpoint policy to each gateway endpoint that restricts access to the corporate DynamoDB table ARNs. On the DynamoDB tables, attach resource-based policies with a condition requiring aws:PrincipalOrgID matching the organization ID.
+- C. Create interface VPC endpoints for Amazon DynamoDB in private subnets across multiple AZs. On each interface endpoint, attach an endpoint policy that denies access to any DynamoDB resource not owned by the organization's AWS account ID, and update security groups to restrict inbound traffic to application subnets.
+- D. In each member account, create IAM permission boundaries attached to all developer roles that deny all dynamodb actions unless the request contains the condition aws:SourceVpc matching one of the approved corporate VPC IDs, and deploy AWS Config rules to monitor compliance across all accounts.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -964,10 +993,11 @@ An enterprise operates 100 AWS accounts in AWS Organizations. Corporate governan
 
 ### Opciones de respuesta
 
-- A. Write a custom Python script using the Boto3 SDK that loops through every account and creates the 35 rules using the PutConfigRule API. Schedule the script to run daily using AWS Lambda.
-- B. Create an SCP with 35 deny statements and attach it to the root of the organization in AWS Organizations.
-- C. Deploy AWS CloudTrail across all accounts and create 35 CloudWatch metric filters with alarms that send email notifications via Amazon SNS.
-- D. Author an AWS Config Conformance Pack containing the 35 rules and remediation actions in a YAML template. Deploy the conformance pack as an Organization Conformance Pack from the AWS Organizations management account or delegated administrator account.
+- A. Create a separate Amazon S3 bucket for each of the 50 accounts in the Central Analytics account. Configure S3 Cross-Region Replication (CRR) from each member account's local bucket to its dedicated bucket in the central account. Use S3 bucket policies with AWS KMS customer managed keys to manage access permissions.
+- B. Register the central Amazon S3 data lake location in AWS Lake Formation in the Central Analytics account. Use Lake Formation permissions to grant fine-grained, column-level access to specific IAM roles in the Data Science and Business Intelligence accounts using AWS RAM for cross-account sharing and Lake Formation tags (LF-tags) for governance.
+- C. Deploy an Amazon Redshift cluster in the Central Analytics account. Use Amazon Redshift data sharing to share datashares with Redshift clusters in the Data Science and Business Intelligence accounts, configuring consumer cluster permissions and row-level security policies directly within Redshift.
+- D. Store all data in an Amazon S3 bucket in the Central Analytics account. Create hundreds of IAM roles with complex inline policies that define column-level projections using Amazon Athena saved queries, and require users in the consumer accounts to assume these roles using AWS STS AssumeRole tokens.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -998,10 +1028,11 @@ A manufacturing enterprise plans to migrate 400 on-premises physical and virtual
 
 ### Opciones de respuesta
 
-- A. Deploy the AWS Application Discovery Agent on all on-premises servers. In AWS Application Discovery Service, collect system performance data and network communication histories. Use AWS Migration Hub Network Diagram and Grouping tools to map dependencies and group servers into migration waves.
-- B. Deploy the AWS Application Migration Service (MGN) replication agent on all servers and immediately initiate block-level replication to AWS.
-- C. Use AWS Migration Evaluator with the collector appliance to estimate monthly cloud costs and generate high-level business cases.
-- D. Export VMware vCenter inventory reports to Excel spreadsheets and manually cross-reference IP addresses using netstat outputs.
+- A. Deploy an Amazon DocumentDB cluster with Multi-AZ enabled. Export the on-premises MongoDB databases using mongodump, upload the dump files to an Amazon S3 bucket, and restore the databases to the Amazon DocumentDB cluster using mongorestore during a scheduled weekend maintenance window.
+- B. Deploy an Amazon DocumentDB (with MongoDB compatibility) cluster. Use AWS Database Migration Service (AWS DMS) with full load and ongoing change data capture (CDC) using a MongoDB source endpoint and an Amazon DocumentDB target endpoint. After verifying data synchronization, switch application connection strings to DocumentDB.
+- C. Deploy MongoDB Enterprise Advanced on a fleet of Amazon EC2 instances in an Auto Scaling group across multiple Availability Zones. Configure MongoDB replica sets with the on-premises cluster as the primary, and initiate failover to promote the AWS EC2 replica to primary during the maintenance window.
+- D. Deploy an Amazon DynamoDB table in on-demand capacity mode. Use the AWS Schema Conversion Tool (AWS SCT) to convert the MongoDB collections and BSON documents into DynamoDB tables, and run an AWS Glue ETL job to migrate historical data and keep the target tables synchronized.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1029,10 +1060,11 @@ A banking company wants to migrate an on-premises 15 TB Microsoft SQL Server dat
 
 ### Opciones de respuesta
 
-- A. Take a full SQL Server backup (.bak), upload it to Amazon S3, and use native RDS restore to launch an Amazon RDS for SQL Server instance. Then, convert the database using pg_dump.
-- B. Use AWS Application Migration Service (MGN) to lift-and-shift the underlying Windows Server and SQL Server instance to Amazon EC2. Change the engine type in the EC2 console.
-- C. Use the AWS Schema Conversion Tool (AWS SCT) to convert the SQL Server schema, triggers, and stored procedures to PostgreSQL syntax, applying the generated scripts to a new Aurora PostgreSQL cluster. Then, configure AWS Database Migration Service (AWS DMS) with a full load and continuous replication (CDC) task. After the target catches up, switch the application endpoint during the 15-minute cutover window.
-- D. Export the database to flat CSV files. Upload the files to Amazon S3 and use the aws_s3 PostgreSQL extension to import the data into Aurora.
+- A. Create a VPC peering connection between the VPCs in both Regions. Use Route 53 latency alias records that point to the ALBs. In the event of an outage in the primary Region, update the Route 53 DNS records to direct 100% of the traffic to the secondary Region's Application Load Balancer.
+- B. Create a VPC peering connection between the VPCs in both Regions. Use a Route 53 weighted routing policy that points to the ALBs. Configure health checks on both records so that Route 53 automatically shifts traffic away from the primary Region if its ALB becomes unhealthy.
+- C. Create a VPC peering connection between the VPCs in both Regions. Configure the ALBs to distribute the traffic across both Regions using cross-zone load balancing. In the target group settings, register the private IP addresses of the EC2 instances in the secondary Region as targets.
+- D. Create an AWS Transit Gateway in each Region and peer the Transit Gateways. In the secondary Region, create an internal ALB and register the cloned EC2 instances. In the primary Region, add the private IP addresses of the internal ALB as targets in the existing public ALB's target group.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -1060,10 +1092,11 @@ An enterprise needs to migrate 500 TB of file shares hosted on an on-premises Ne
 
 ### Opciones de respuesta
 
-- A. Deploy an AWS DataSync agent as a virtual machine in the on-premises environment. Configure a DataSync task with the on-premises SMB file share as the source and the Amazon FSx for Windows File Server file system as the destination, enabling options to transfer permissions, ownership, and timestamps. Configure task bandwidth throttling to limit network consumption during business hours.
-- B. Order five AWS Snowball Edge Storage Optimized devices. Copy the files to the Snowball devices using standard rsync scripts and ship them to AWS.
-- C. Mount the on-premises SMB share on an EC2 instance in AWS over Direct Connect. Use Robocopy scripts with PowerShell to copy files continuously.
-- D. Set up an AWS Storage Gateway File Gateway on-premises. Point applications to the Storage Gateway to automatically replicate files to Amazon S3, and then copy from S3 to FSx.
+- A. Use the VM Import/Export service to export on-premises VMware virtual machine disk images (VMDK) to Amazon S3. Configure an automated PowerShell script to convert the S3 objects into Amazon EC2 AMIs and launch instances into the target VPC during a weekend cutover window.
+- B. Deploy an AWS Storage Gateway Volume Gateway appliance in the on-premises VMware environment. Create gateway-cached volumes mapped to the on-premises VMs. Take point-in-time EBS snapshots of the storage volumes in AWS and create Amazon EC2 instances from the snapshots.
+- C. Use AWS Application Migration Service (AWS MGN). Install the AWS Replication Agent on all 150 on-premises Windows and Linux servers. Configure continuous block-level data replication over Direct Connect. Launch test instances in an isolated subnet for non-disruptive validation, and execute final cutover.
+- D. Deploy AWS DataSync agents in the on-premises data center. Configure DataSync tasks to replicate root and data volumes from on-premises servers to Amazon Elastic File System (Amazon EFS) file systems. Launch generic EC2 instances in AWS and mount the EFS file systems during instance boot.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1091,10 +1124,11 @@ A company runs a monolithic .NET Framework application on Windows Server 2012 R2
 
 ### Opciones de respuesta
 
-- A. Use AWS Application Migration Service (MGN) to replicate the Windows Server 2012 R2 VMs to Amazon EC2 instances running Windows Server 2022.
-- B. Use AWS App2Container (A2C) to containerize the application as a Windows container and deploy it on Amazon EC2 instances managed by an Auto Scaling group.
-- C. Lift and shift the VMs to AWS Elastic Beanstalk using the Windows Server platform.
-- D. Use AWS Microservice Extractor for .NET and the AWS Toolkit to refactor and port the .NET Framework application code to .NET Core on Linux. Package the application as a Docker container, push the image to Amazon Elastic Container Registry (ECR), and run the service on Amazon Elastic Container Service (ECS) using the AWS Fargate launch type.
+- A. Deploy AWS DataSync agents on on-premises virtual machines to synchronize file data continuously over the public Internet to an Amazon S3 bucket. After the initial synchronization phase completes, configure an S3 Lifecycle transition rule to migrate the objects to an Amazon FSx for Windows File Server file system within 24 hours while keeping local shares active.
+- B. Order multiple AWS Snowball Edge Storage Optimized devices. Copy the 120 TB of data to the Snowball devices on-premises, ship them back to AWS, and import the data into an Amazon S3 bucket. Deploy an Amazon FSx for Windows File Server Multi-AZ file system. Deploy an AWS DataSync agent on an EC2 instance in the VPC to transfer the incremental changes from on-premises to FSx over the Direct Connect connection, preserving NTFS ACLs.
+- C. Order an AWS Snowmobile to transfer the 120 TB of data over a dedicated physical fiber optic connection direct to the AWS data center. Once the data arrives at the AWS facility, import the file shares directly into an Amazon FSx for Lustre file system configured with cross-region replication to an Amazon FSx for Windows File Server deployment in the target production VPC.
+- D. Deploy an AWS Storage Gateway File Gateway virtual appliance on the VMware cluster on-premises. Configure an SMB file share on the gateway pointing to an Amazon S3 bucket. Mount the SMB share on-premises, copy the entire 120 TB data set over the 100 Mbps Direct Connect connection, and mount the S3 bucket directly on newly launched Amazon EC2 Windows Server instances.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -1122,10 +1156,11 @@ A media archive facility must migrate 2 PB of historical video recordings from a
 
 ### Opciones de respuesta
 
-- A. Order multiple AWS Snowball Edge Storage Optimized devices. Copy the video files onto the Snowball devices locally using the S3 adapter. Ship the devices to AWS for direct data import into Amazon S3 Glacier Deep Archive.
-- B. Compress the video files and upload them over the 1 Gbps Internet connection directly to an S3 bucket using AWS DataSync.
-- C. Order an AWS Snowcone device. Transfer the files continuously in batches over the 4-week window.
-- D. Provision an AWS Direct Connect 100 Gbps dedicated connection and stream the files using AWS Transfer Family.
+- A. Perform an all-at-once migration by freezing on-premises changes for a 48-hour weekend window. Export all data using Oracle Data Pump utilities, upload the dump files to Amazon S3 via AWS Snowball devices, import the schemas and data into Aurora PostgreSQL using pg_restore, and redirect all 20 microservice database connection endpoints simultaneously during Sunday night.
+- B. Use the AWS Schema Conversion Tool (AWS SCT) to convert the Oracle database schema to PostgreSQL. Deploy AWS Database Migration Service (AWS DMS) with full load and continuous change data capture (CDC) to keep Aurora synchronized with Oracle. Apply the Strangler Fig pattern by deploying an API Gateway or Application Load Balancer in front of the services, refactoring one microservice at a time to query Aurora, and retiring the Oracle database after the final service is migrated.
+- C. Deploy Amazon RDS for Oracle in AWS using a Multi-AZ DB instance deployment. Set up an Oracle Active Data Guard standby replica in AWS connected over the dedicated Direct Connect connection. Promote the standby database to primary, and then configure recurring scheduled AWS Glue ETL jobs to convert tables into Aurora PostgreSQL on a weekly batch schedule.
+- D. Deploy an Amazon DocumentDB cluster and convert the relational schema into JSON BSON document collections using AWS SCT. Use AWS DataSync to continuously synchronize database tables from Oracle to DocumentDB across the network. Rewrite all 20 microservices to use the MongoDB API, and execute a blue/green DNS cutover using Amazon Route 53 weighted records.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1153,10 +1188,11 @@ A corporate enterprise plans to migrate 300 on-premises virtual machines running
 
 ### Opciones de respuesta
 
-- A. AWS Server Migration Service (SMS)
-- B. AWS Application Migration Service (AWS MGN)
-- C. AWS DataSync
-- D. AWS Backup with gateway appliances
+- A. Deploy an Auto Scaling group of Amazon EC2 instances running Windows Server in private subnets across multiple Availability Zones. In the EC2 user data script, configure PowerShell DSC to download the .NET application package from Amazon S3, install IIS features, and register the instance with an Application Load Balancer target group.
+- B. Containerize the .NET Framework application into Windows Server container images. Deploy the application on Amazon ECS using the AWS Fargate launch type with Windows containers, placed behind an Application Load Balancer. Configure ECS Service Auto Scaling based on target tracking metrics to scale tasks automatically without managing underlying EC2 hosts.
+- C. Deploy an Amazon EKS cluster with self-managed Windows Server worker nodes running across three Availability Zones. Use Helm charts to deploy the application pods, configure persistent volumes backed by Amazon EBS, and configure the Kubernetes Cluster Autoscaler to launch new EC2 Windows instances when pod scheduling capacity is exhausted.
+- D. Rewrite the .NET Framework application into .NET Core and deploy it on AWS Elastic Beanstalk using the Linux multi-container Docker platform. Configure rolling deployments with an additional batch to ensure zero downtime during application upgrades, and use an Amazon RDS for SQL Server database backend for persistence.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -1184,10 +1220,11 @@ An enterprise CIO wants to understand the total cost of ownership (TCO) and busi
 
 ### Opciones de respuesta
 
-- A. AWS Migration Evaluator
-- B. AWS Application Discovery Service
-- C. AWS Pricing Calculator
-- D. AWS Cost Explorer
+- A. Migrate the application to Amazon Elastic Container Service (Amazon ECS) on AWS Fargate. Deploy an Amazon ElastiCache for Valkey/Redis cluster in a private subnet. Update the application to store and retrieve user session state in ElastiCache using standard Redis session providers. Configure the ECS service with Service Auto Scaling behind an ALB.
+- B. Deploy the application across multiple Amazon EC2 instances in an Auto Scaling group. Enable sticky sessions (session affinity) on the Application Load Balancer using application-based cookies with a 1-day duration, and configure cross-zone load balancing to ensure sessions remain pinned to specific instances.
+- C. Attach an Amazon Elastic Block Store (Amazon EBS) Multi-Attach volume to all EC2 instances in the Auto Scaling group. Configure the Tomcat web server to write session state files directly to the shared EBS block device using a clustered file system like GFS2.
+- D. Configure the Java application to write session state to local instance store NVMe SSDs. Set up a cron job that runs every 60 seconds on each EC2 instance to synchronize the local session files to an Amazon S3 bucket using the AWS CLI s3 sync command.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1215,10 +1252,11 @@ An enterprise operates a mission-critical 8 TB Oracle Enterprise Edition databas
 
 ### Opciones de respuesta
 
-- A. Export the entire database using Oracle Data Pump (expdp) into a dump file, upload it to S3, and import it into RDS using impdp.
-- B. Create a cold backup of the database on tape, ship the tape to AWS, and restore it.
-- C. Use Oracle Data Guard to configure the Amazon RDS for Oracle DB instance as a physical standby replica of the on-premises primary database over AWS Direct Connect. Keep the replica in sync continuously, and execute a Data Guard switchover during the 10-minute cutover window.
-- D. Use AWS Database Migration Service (DMS) with full load only without configuring CDC.
+- A. Create an Amazon EventBridge scheduled rule that invokes an AWS Lambda function every 15 minutes to run an AWS DMS resume-task API call, evaluating the replication lag metric in CloudWatch, logging detailed execution traces to Amazon S3, and triggering an Amazon SNS notification to database engineers if replication latency exceeds 60 seconds.
+- B. Use the AWS Schema Conversion Tool (AWS SCT) to convert the Oracle database schema and code objects to Amazon Aurora PostgreSQL. Deploy an AWS DMS replication instance with Multi-AZ enabled. Configure a full load plus CDC task. Create primary keys on the target tables, add validation, and configure target database indexes after the full load completes to ensure high replication throughput.
+- C. Deploy Oracle GoldenGate on high-memory Amazon EC2 instances in a private subnet to replicate data from the on-premises Oracle database to Aurora PostgreSQL. Configure an Amazon Kinesis Data Stream between GoldenGate and Aurora to buffer transaction change events during network interruptions over Direct Connect.
+- D. Perform an offline initial data migration using AWS Snowball Edge devices with AWS DMS pre-installed and configured. Ship the physical devices to AWS, import data into Aurora, and use AWS DataSync over the public internet to stream real-time database write-ahead log (WAL) changes directly to the Aurora PostgreSQL cluster.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -1246,10 +1284,11 @@ A corporate environment has multiple legacy Windows applications running on Amaz
 
 ### Opciones de respuesta
 
-- A. Amazon Elastic File System (EFS) with Max I/O performance mode.
-- B. Amazon S3 bucket mounted on EC2 instances using the AWS Storage Gateway File Gateway.
-- C. Amazon FSx for Windows File Server deployed in a Multi-AZ configuration joined to the corporate AWS Managed Microsoft AD domain.
-- D. Amazon EBS General Purpose SSD (gp3) volume configured with Multi-Attach enabled across the EC2 instances.
+- A. Deploy an Amazon CloudFront distribution with an origin group containing the on-premises data center origin as primary and the AWS Application Load Balancer as secondary. Configure CloudFront to fail over to AWS if the on-premises origin returns HTTP 500/502/503/504 status codes.
+- B. In Amazon Route 53, create a weighted routing policy with two record sets: one pointing to the on-premises data center public IP address and one pointing to the AWS ALB. Assign an initial weight of 100 to on-premises and 0 to AWS. Gradually increase the AWS weight (e.g., to 10, then 50, then 100) while monitoring application health metrics in CloudWatch.
+- C. Deploy AWS Global Accelerator with two endpoint groups: one pointing to the on-premises firewall external IP address and one pointing to the AWS Application Load Balancer. Use traffic dial settings to shift 100% of incoming TCP traffic to the AWS endpoint group during a single maintenance window.
+- D. In Amazon Route 53, configure a geolocation routing policy that directs all North American users to the on-premises environment and all European users to the AWS environment. Once verified, delete the on-premises DNS record and create a simple routing record pointing to the AWS ALB.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -1277,10 +1316,11 @@ An insurance enterprise runs core transaction workloads on an on-premises IBM z/
 
 ### Opciones de respuesta
 
-- A. AWS Application Migration Service (MGN)
-- B. AWS Mainframe Modernization with the Automated Refactor pattern (AWS Blu Age)
-- C. AWS Serverless Application Model (AWS SAM)
-- D. AWS Snowmobile
+- A. Deploy an Amazon FSx for Windows File Server file system across two Availability Zones. Configure an AWS Storage Gateway File Gateway in the VMware cluster, map local Windows clients to the gateway SMB share, and allow background synchronization to push the 50 TB of data to FSx over the 1 Gbps Direct Connect connection, maintaining continuous caching.
+- B. Deploy an Amazon FSx for Windows File Server Multi-AZ file system integrated with the corporate Active Directory. Deploy an AWS DataSync agent in the on-premises environment. Create a DataSync task to transfer data from the on-premises SMB share to FSx, configuring the task to copy file data, metadata, and NTFS ACLs. Run the task to perform the initial transfer, and run it again during the cutover window for final sync.
+- C. Deploy an Amazon Elastic File System (Amazon EFS) file system configured with Provisioned Throughput mode. Use the multi-threaded robocopy utility on on-premises Windows servers to copy files directly to the EFS mount target over Direct Connect, attempting to preserve file timestamps, attributes, and NTFS discretionary access control lists.
+- D. Order an AWS Snowball Edge Storage Optimized device with 80 TB capacity. Copy the 50 TB of data from the on-premises share to the Snowball device using the S3 adapter. Ship the device to AWS to load data into Amazon S3. In AWS, deploy an EC2 instance that runs a PowerShell script to copy objects from S3 to Amazon FSx.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -1311,10 +1351,11 @@ An enterprise operates a shared Tools AWS account and separate Production accoun
 
 ### Opciones de respuesta
 
-- A. In the Tools account, encrypt the S3 artifact bucket using the default aws/s3 key. In the Production accounts, attach an IAM policy to the ECS task execution role granting s3:GetObject.
-- B. In the Tools account, encrypt the S3 artifact bucket using a customer managed key (CMK) in AWS KMS. In the KMS key policy, grant cross-account permissions to the Production accounts' deployment roles. In each Production account, create an IAM cross-account deployment role that trusts the CodePipeline service and has permissions to deploy to ECS and use the KMS CMK. Configure CodePipeline stages with cross-Region and cross-account actions referencing these roles.
-- C. Configure S3 bucket policies in the Tools account with public read access restricted by an IP address condition. Configure CodePipeline to use public S3 URLs.
-- D. Move the CodePipeline pipeline into the Production account and create a VPC peering connection back to the Tools account to pull code from CodeCommit.
+- A. Use AWS CodeDeploy with a Canary10Percent10Minutes deployment configuration on Amazon ECS. Configure CloudWatch alarms for 5xx errors and latency on the ALB target group. If an alarm triggers during the 10-minute canary evaluation window, CodeDeploy automatically rolls back traffic to the original task set immediately.
+- B. Use AWS CodePipeline with an AWS CloudFormation action that initiates a rolling update on the ECS service. Enable the deployment circuit breaker with automatic rollback enabled. Configure minimumHealthyPercent to 100% and maximumPercent to 200% to evaluate health over an hour.
+- C. Deploy a secondary ECS service behind a separate Application Load Balancer. In Amazon Route 53, configure a weighted routing policy that sends 10% of traffic to the secondary ALB and 90% to the primary ALB. Create an AWS Lambda function that monitors CloudWatch and deletes the secondary service on failure.
+- D. Use AWS CodeDeploy with an AllAtOnce deployment configuration for Amazon ECS. Configure an ALB test listener on port 8080. Require quality assurance engineers to manually test the new version on port 8080 within 15 minutes, after which CodeDeploy shifts 100% of production traffic to the new task set.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -1342,10 +1383,11 @@ A financial company builds and deploys microservices packaged as Docker containe
 
 ### Opciones de respuesta
 
-- A. In the Dockerfile, add a curl command to download an open-source vulnerability list during docker build. If an exit code is non-zero, fail the build.
-- B. Configure an EC2 cron job that runs weekly to scan images in Amazon ECR using a custom Python script.
-- C. Deploy a third-party antivirus agent on every EKS worker node to scan containers after they are running in the cluster.
-- D. Store container images in Amazon Elastic Container Registry (ECR) with enhanced scanning enabled using Amazon Inspector. In AWS CodePipeline, configure an AWS CodeBuild step following the image push that polls the ECR image vulnerability findings via the DescribeImageScanFindings API, and fails the build step if any findings exceed the defined severity threshold.
+- A. In the management account, create a central CloudFormation template in an S3 bucket. Write a Python script using the AWS SDK (boto3) that iterates through all member accounts and Regions using assumed admin roles and executes create-stack calls. Run the script via Jenkins on a weekly cron schedule.
+- B. In the management account, deploy an AWS CloudFormation StackSet with service-managed permissions targeted to the organization root or specific OUs. Enable automatic deployment to ensure new accounts automatically receive stack instances, and configure failure tolerance and max concurrent accounts to deploy across multiple Regions simultaneously.
+- C. Configure AWS Control Tower Account Factory to provision accounts. In each member account, manually configure AWS Systems Manager State Manager associations to download and execute the baseline CloudFormation template from a central S3 bucket on a daily recurring schedule.
+- D. In AWS Service Catalog, create a portfolio containing the baseline CloudFormation product. Share the portfolio with all 100 accounts using AWS RAM. Create a Lambda function in each account triggered on the CreateAccount event that invokes the Service Catalog provision-product API.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -1373,10 +1415,11 @@ An organization operating across 60 AWS accounts requires hardened 'Golden AMIs'
 
 ### Opciones de respuesta
 
-- A. Use EC2 Image Builder to create an image pipeline with build components and automated test components. Configure an infrastructure configuration and an Image Builder distribution settings resource that specifies the target 60 account IDs and target Regions. Schedule the pipeline to run monthly and use an Amazon EventBridge rule to notify teams when new AMIs are available.
-- B. Write a custom Packer template on an EC2 instance that builds the AMI. Execute a Python script that iterates through all accounts and calls the ModifyImageAttribute API to share the AMI.
-- C. Use AWS Systems Manager State Manager to continuously run patch commands on running production instances and take snapshots every Sunday.
-- D. Create an AWS CloudFormation template that launches an EC2 instance in each account, runs user data scripts to patch the OS, and triggers an AWS Lambda function to create an AMI locally in each account.
+- A. In the AWS CodePipeline build stage, configure AWS CodeBuild to pull the image and run an open-source container scanning script. If vulnerabilities are found, configure CodeBuild to write an error to the build logs and send an email notification to the security team using Amazon SES.
+- B. Enable Amazon Inspector enhanced scanning on the Amazon Elastic Container Registry (Amazon ECR) repository. In AWS CodePipeline, add a test action after the image push stage that invokes an AWS Lambda function to query Inspector scan findings via the DescribeImageScanFindings API, failing the pipeline if any critical severity CVEs are present.
+- C. Deploy Amazon GuardDuty with EKS Protection enabled. Configure an Amazon EventBridge rule that detects GuardDuty container runtime findings and triggers an AWS Systems Manager Automation document that revokes IAM deployment role credentials and rolls back the ECS task definition.
+- D. Configure an SCP on the workload OU that denies ecs:CreateService and ecs:UpdateService if the container image tag is latest. Require developers to sign container images using AWS Signer, and configure Amazon EKS admission controllers to block unsigned container images.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1404,10 +1447,11 @@ An enterprise runs an e-commerce catalog application on EC2 instances in an Auto
 
 ### Opciones de respuesta
 
-- A. Configure the Auto Scaling group health check type to EC2 only. Have developers manually connect via SSH to dump memory when alerts fire.
-- B. Write a cron job inside the instance that checks the local port. If the port fails, the script runs shutdown -h now.
-- C. Configure the Auto Scaling group to use ELB health checks. In Amazon EventBridge, create a rule that captures the EC2 Auto Scaling Instance Terminate Lifecycle Hook event. Trigger an AWS Systems Manager Automation document that runs a script on the instance via Run Command to capture the heap dump and upload it to an S3 bucket before completing the lifecycle action to terminate the instance.
-- D. Increase the health check grace period on the Auto Scaling group to 3,600 seconds and disable instance termination policies.
+- A. In each member account, create Amazon CloudWatch alarms on the StatusCheckFailed metric for each EC2 instance and ALB target group. Configure the alarms to publish to a regional Amazon SNS topic, and subscribe the operations team distribution email to the SNS topic, establishing cross-account IAM role trust relationships for centralized alarm viewing.
+- B. Configure an Amazon EventBridge rule in every member account that captures AWS Health events (source: aws.health). Configure the rule to forward events to a centralized EventBridge event bus in the central Monitoring account. In the Monitoring account, create a rule on the central bus that routes events to an Amazon SNS topic and triggers an AWS Lambda function for automated incident triage.
+- C. Deploy an Amazon CloudWatch agent on all EC2 instances across all accounts that scrapes the AWS Health API endpoint every 60 seconds and publishes health metrics to a custom CloudWatch namespace. Create a centralized CloudWatch dashboard in the management account, configuring metric alarms on service availability.
+- D. In the management account, use AWS Trusted Advisor to monitor service limits and operational health across all accounts. Create an automated AWS Systems Manager Automation document that runs daily, queries Trusted Advisor checks for all member accounts, and exports the findings to an Amazon S3 bucket for analysis in Athena.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -1435,10 +1479,11 @@ A financial startup deploys payment processing microservices using AWS Lambda an
 
 ### Opciones de respuesta
 
-- A. Create two separate Lambda functions (V1 and V2) in the SAM template. Use an Application Load Balancer with weighted target groups to manually shift weights using a custom Python script.
-- B. In the AWS SAM template, configure the DeploymentPreference of the Lambda function with the Type set to Linear10PercentEvery1Minute or Canary10Percent10Minutes. Specify Amazon CloudWatch Alarms monitoring function errors and latency under the Alarms property to trigger an automated rollback via AWS CodeDeploy.
-- C. In the API Gateway console, manually create a new stage named Beta and ask customer support to test the Beta URL for 10 minutes before updating the Production stage.
-- D. Deploy a second API Gateway endpoint. Use Route 53 weighted routing to split traffic between the two API Gateway domains.
+- A. Deploy AWS CloudFormation StackSets with self-managed permissions to create AWS Config rules in each account. Configure each rule to trigger an inline AWS Lambda function that parses the resource configuration, determines whether it complies with corporate tagging standards, and sends a notification email to the resource creator.
+- B. In the delegated administrator account for AWS Config, deploy an organization-wide conformance pack that includes managed rules such as required-tags and encrypted-volumes. Configure automatic remediation using AWS Systems Manager Automation runbooks (e.g., AWS-ApplyTags, AWS-EnableEBSVolumeEncryption) triggered upon non-compliance.
+- C. Create a Service Control Policy (SCP) attached to the organization root that specifies a Deny effect on all resource creation actions (such as ec2:RunInstances, s3:CreateBucket) if the request does not include an explicit resource tag and server-side encryption parameter header.
+- D. Deploy Amazon GuardDuty across all accounts and Regions. Configure custom GuardDuty threat detection criteria based on resource tags and unencrypted storage volumes. Configure GuardDuty finding export to an Amazon S3 bucket in a central security account for quarterly compliance review.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** B
@@ -1466,10 +1511,11 @@ An enterprise development team uses AWS CloudFormation to provision cloud infras
 
 ### Opciones de respuesta
 
-- A. AWS Systems Manager State Manager
-- B. Amazon Inspector
-- C. AWS Trusted Advisor
-- D. AWS CloudFormation Guard (cfn-guard)
+- A. In each account, configure Amazon CloudWatch Logs subscription filters on the respective log groups to stream events directly to an Amazon Kinesis Data Firehose delivery stream in the Security account. Configure Kinesis Data Firehose to deliver the log streams into a centralized Amazon S3 bucket, and enforce S3 Object Lock in compliance mode.
+- B. In each member account, configure an AWS Lambda function triggered by Amazon EventBridge rules to export log streams to local S3 buckets daily. Configure S3 Cross-Region Replication (CRR) from all local buckets to a central bucket in the Security account, and encrypt the destination bucket with an SSE-S3 key.
+- C. Deploy Amazon OpenSearch Service in the Security account. Install Fluent Bit agents on all EC2 instances across all 50 accounts, configuring the agents to stream logs directly over public internet endpoints into the OpenSearch cluster with index lifecycle management policies.
+- D. Use AWS CloudTrail Insights in each member account to detect log anomaly events. Export the Insights events to an Amazon SQS queue in each account, and deploy a centralized fleet of EC2 worker instances in the Security account that polls all 50 SQS queues and archives the raw events to Amazon S3 Glacier.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
@@ -1497,10 +1543,11 @@ A multi-region application deployed in us-east-1 and us-west-2 requires access t
 
 ### Opciones de respuesta
 
-- A. Store the secret in AWS Secrets Manager in us-east-1 and configure primary secret replication to us-west-2. Enable automatic rotation in the primary Region using a pre-configured AWS Lambda function. Applications in both Regions retrieve the secret from their local regional Secrets Manager endpoint.
-- B. Store the secret in an Amazon DynamoDB Global Table with client-side encryption. Use an EventBridge cron rule to trigger an EC2 instance that updates the password.
-- C. Store the secret in AWS Systems Manager Parameter Store in us-east-1. Write a custom Lambda function triggered on a schedule to copy parameters to us-west-2.
-- D. Save the database credentials in a configuration file within an encrypted S3 bucket in us-east-1 and replicate the bucket to us-west-2 using S3 Cross-Region Replication.
+- A. In AWS CodePipeline, use AWS CodeDeploy with a Canary10Percent5Minutes deployment preference for the serverless application. Configure an Amazon CloudWatch alarm on the Lambda function's Errors and Duration metrics. If the alarm triggers during the canary phase, CodeDeploy automatically rolls back the alias to the previous function version.
+- B. In AWS CodePipeline, configure an AWS CloudFormation deployment action with change sets. Deploy the new Lambda function version and immediately point the production API Gateway stage to the new version. If manual smoke tests fail, initiate a rollback by deploying a previous CloudFormation template.
+- C. Configure the AWS SAM template with AutoPublishAlias set to live and DeploymentPreference set to AllAtOnce. Configure Amazon CloudWatch synthetics canaries to send test traffic to the Lambda function. If the canary detects errors within 15 minutes, trigger an AWS Lambda function to update the alias manually.
+- D. In Amazon API Gateway, configure weighted canary settings on the production stage to send 10% of traffic to the new stage deployment. Configure an Amazon EventBridge rule that checks CloudWatch error metrics every 5 minutes and invokes an API Gateway update-stage API call to promote or roll back traffic.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1528,10 +1575,11 @@ An e-commerce company wants to release a new checkout workflow to a small percen
 
 ### Opciones de respuesta
 
-- A. Store configuration settings in an Amazon RDS table. Have application servers poll the database every second for updates.
-- B. Create a new application build with hardcoded logic for each percentage change and deploy via AWS CodeDeploy using an all-at-once strategy.
-- C. Use AWS AppConfig to manage the feature flag configuration. Define an AppConfig deployment strategy that gradually rolls out the configuration changes, and configure an Amazon CloudWatch alarm as an automatic rollback monitor. Use the AppConfig Agent or SDK in the application to retrieve configuration updates dynamically.
-- D. Use AWS Systems Manager Parameter Store and write a custom polling script on each EC2 instance that restarts the web server daemon whenever a change in parameter version is detected.
+- A. In AWS CloudFormation, enable stack drift detection across all stacks. Configure a scheduled Amazon EventBridge rule that invokes the detect-stack-drift API on all production stacks every hour. If drift is detected, configure an AWS Lambda function to automatically delete and recreate the drifted resources to enforce consistency.
+- B. Deploy AWS Config rules (cloudformation-stack-drift-detection-check) to continuously monitor stack drift. Attach a Service Control Policy (SCP) to the workload OUs that denies CloudFormation, EC2, and RDS modification actions to all IAM principals except the specific IAM role used by the CI/CD pipeline, preventing manual console and CLI changes.
+- C. Attach a CloudFormation stack policy to each production stack that specifies an explicit Deny effect on all resource updates. When the CI/CD pipeline runs, configure the pipeline to delete the stack policy before deploying changes and recreate the stack policy after the deployment succeeds to protect resources.
+- D. In each production account, remove all IAM policies from developer and administrator roles. Require all engineers to submit AWS Support tickets to request manual configuration changes on production infrastructure, and review CloudTrail logs weekly to verify adherence and audit manual adjustments.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** C
@@ -1559,10 +1607,11 @@ A security incident response team discovers that long-term IAM user access keys 
 
 ### Opciones de respuesta
 
-- A. Configure an Amazon EventBridge rule that listens for AWS Health events regarding compromised credentials (AWS_RISK_CREDENTIALS_EXPOSED). Target an AWS Lambda function that invokes the UpdateAccessKey API to deactivate the exposed key and publishes an alert to an Amazon SNS topic.
-- B. Run a daily AWS Config rule check for IAM users with keys older than 90 days and trigger an SSM Automation runbook to delete the keys.
-- C. Use Amazon Inspector to scan all developer laptops every 24 hours.
-- D. In AWS IAM, configure an account-wide password policy that forces key rotation every 24 hours.
+- A. In AWS Systems Manager Patch Manager, configure a patch baseline with an auto-approval rule set to approve patches 7 days after release. Use Quick Setup to configure a patch policy deployed across all accounts in the organization, defining separate maintenance windows for dev, test, and prod, and generating centralized compliance reports.
+- B. Use Amazon Inspector to scan all EC2 instances across all accounts for operating system vulnerabilities. Configure Amazon Inspector to automatically apply security patches to all non-compliant instances during the next reboot using an automated EventBridge rule and Lambda function.
+- C. Configure EC2 Image Builder to build an updated golden AMI every weekend. Configure an automated pipeline that replaces all running EC2 instances across all 50 accounts by terminating them and launching new instances from the updated golden AMI within an Auto Scaling group rolling deployment.
+- D. Create an AWS Systems Manager State Manager association in each account that runs the AWS-RunPatchBaseline command every 24 hours on all managed nodes without scheduling or environment separation, immediately installing all available patches and rebooting instances when required.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** A
@@ -1590,10 +1639,11 @@ A financial banking platform operates an active-active multi-region workload acr
 
 ### Opciones de respuesta
 
-- A. AWS CloudFormation StackSets
-- B. AWS Systems Manager Patch Manager
-- C. Amazon CloudWatch Synthetics
-- D. AWS Fault Injection Simulator (AWS FIS)
+- A. Deploy a custom AWS Lambda function triggered by an Amazon EventBridge rule that executes every 60 seconds. In the Lambda code, use the AWS SDK to randomly terminate EC2 instances, detach EBS volumes, and inject simulated network packet loss using iptables commands sent via SSM Run Command.
+- B. Use AWS Systems Manager Patch Manager to simulate infrastructure degradation by scheduling maintenance windows during peak production hours that intentionally reboot database instances and drain ALB target groups without prior notice to the application team.
+- C. Deploy Amazon CloudWatch Synthetics canaries configured to simulate distributed denial-of-service (DDoS) traffic spikes against the application endpoints, while configuring AWS WAF rate-based rules to evaluate whether the application maintains acceptable latency thresholds.
+- D. Use AWS Fault Injection Simulator (AWS FIS). Create FIS experiment templates that define targeted faults (such as CPU stress, network latency, packet loss, and simulated DB failover) across EC2, ECS, and Aurora resources. Configure stop conditions integrated with Amazon CloudWatch alarms to halt experiments automatically if error thresholds are exceeded.
+
 
 > [!question]- Ver respuesta y justificación
 > **Respuesta correcta:** D
